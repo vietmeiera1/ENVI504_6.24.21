@@ -12,7 +12,7 @@ data$TOBS # $ sign lets you select a specific column
 
 m <- mean(data$TOBS, na.rm = TRUE) #adding na.rm = TRUE is the default function in Excel
   #This removes the "NA" from the file. NA is a gap in the data. 
-s <- sd(datq$TOBS, na.rm = TRUE) #standard deviation of the column TOBS. 
+s <- sd(data$TOBS, na.rm = TRUE) #standard deviation of the column TOBS. 
 
 sk <- skewness(data$TOBS, na.rm = TRUE) #we have these functions from loading e1071
 kt <- kurtosis(data$TOBS, na.rm = TRUE) #we have this function from loading e1071
