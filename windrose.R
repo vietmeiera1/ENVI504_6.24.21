@@ -4,7 +4,6 @@ library(ggplot2)
 wind <- read_csv("pgh_weather.csv")
 
 dir <- hist(wind$`Wind Dir`)
-br <- 10(c(0:36))
 br <- 10*(c(0:36))
 dir <- hist(wind$`Wind Dir`, breaks = br)
 
