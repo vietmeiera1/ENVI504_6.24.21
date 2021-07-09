@@ -1,0 +1,174 @@
+---
+title: "equations"
+author: "Anna Vietmeier"
+date: "7/8/2021"
+output: html_document
+---
+
+---
+title: "Equations"
+author: "David Kahler"
+date: "4/28/2021"
+output: html_document
+header-includes: 
+      \usepackage{amsmath}
+      \usepackage{isotope}
+      \usepackage{pdfpages}
+      \usepackage{pdflatex}
+---
+
+# R Markdown with Equations in $\LaTeX$
+
+The purpose of this document is to demonstrate the utility of R Markdown in the preparation of documents.  Recently, a colleague came to me with a formatting problem: a book publisher was requiring tue use of $\LaTeX$ or MathType.  I recommended $\LaTeX$ in R Markdown.  
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.  
+
+To check the rendering of equations (the TeX code is all you need to send to the publisher), make sure to add:   
+```{r eval=FALSE}
+\usepackage{amsmath}  
+\usepackage{isotope}  
+```
+to your R Markdown header.  The amsmath package contains most all of the $\LaTeX$ commands and the isotope package is helpful for chemical equations.
+
+## Writing Equations  
+For inline equations, you start and end the $\LaTeX$ string with $.  To enter a centered equation, start with:  
+```{r eval=FALSE}
+\begin{equation}
+N = N_0 e^{-\lambda t}
+\end{equation}
+```
+
+### Example Equations
+#### 8.1
+\begin{equation}
+N = N_0 e^{-\lambda t}
+\end{equation}
+
+#### 8.2
+\begin{equation}
+\label{eq:8.2}
+\mathrm{^{226}_{88}Ra} \rightarrow \mathrm{^{222}_{86}Rn} + \mathrm{^{4}_{2}He^{2+}} + \gamma + hv  
+\end{equation}
+
+#### 8.3
+\begin{equation}
+\mathrm{^{228}_{88}Ra} \rightarrow \mathrm{^{228}_{89}Ac} + \mathrm{e^{-}} + \gamma + hv  
+\end{equation}
+
+#### 8.4
+\begin{equation}
+A_n = \lambda_n N_n
+\end{equation}
+
+#### 8.5
+\begin{equation}
+N_n = c_{1} e^{-\lambda_1 t} + c_{2} e^{-\lambda_2 t} + c_{3} e^{-\lambda_3 t} + \ldots + c_{n} e^{-\lambda_n t}
+\end{equation}
+
+#### 8.6
+\begin{equation}
+c_1 = \frac{\lambda_1 \lambda_2 \ldots \lambda_{n-1}}{(\lambda_2 -\lambda_1) (\lambda_3 -\lambda_1) (\lambda_n \lambda_1)} N^{0}_{1}
+\end{equation}
+
+#### 8.7
+\begin{equation}
+c_2 = \frac{\lambda_1 \lambda_2 \ldots \lambda_{n-1}}{(\lambda_1 -\lambda_2) (\lambda_3 -\lambda_2) (\lambda_n \lambda_2)} N^{0}_{1}
+\end{equation}
+
+#### 8.8
+\begin{equation}
+c_3 = \frac{\lambda_1 \lambda_2 \ldots \lambda_{n-1}}{(\lambda_1 -\lambda_n) (\lambda_2 -\lambda_n) (\lambda_{n-1} -\lambda_n)} N^{0}_{1}
+\end{equation}
+
+#### 8.9
+\begin{equation}
+\log([\mathrm{^{226}Ra}]) = 1.3536 \times \log({TDS}) - 4.4513
+\end{equation}
+
+#### 8.10
+\begin{equation}
+\log([\mathrm{^{226}Ra}]) = 0.6521 \times \log(\mathrm{[Cl]}) - 0.8448
+\end{equation}
+
+#### 7.1
+\begin{equation}
+M_0 = G \bar{d} A
+\end{equation}
+
+#### 7.2
+\begin{equation}
+M_W = \frac{2}{3} \log_{10}M_0 - 6.03
+\end{equation}
+
+The original equation used a slanted fraction bar to express the two-thirds.  This is not available in R Markdown.  With a different TeX platform, \sfrac may work as part of the xfrac package.
+
+#### 7.3
+\begin{equation}
+M_L = \log_{10}A + 2.56 \log_{10} \Delta - 1.67
+\end{equation}
+
+#### 7.4
+\begin{equation}
+\log_{10} N = a - b M, M \geq M_C
+\end{equation}
+
+#### 7.5
+\begin{equation}
+\sigma (x) = \begin{bmatrix} \sigma_{11} & \sigma_{12} & \sigma_{13} \\ \sigma_{21} & \sigma_{22} & \sigma_{23} \\ \sigma_{31} & \sigma_{32} & \sigma_{33} \end{bmatrix}
+\end{equation}
+
+#### 7.6
+Check prime usage:
+\begin{equation}
+S_V(z) = \int_0^{z} \rho (z^\prime) g d z^\prime
+\end{equation}
+
+#### 7.7
+\begin{equation}
+\sigma_n^\prime = \sigma_n - \alpha P
+\end{equation}
+
+#### 7.8
+\begin{equation}
+\mathrm{\bf{T}} = \mathrm{\bf{\sigma \hat{n}}}
+\end{equation}
+
+#### 7.9
+\begin{equation}
+\lvert \tau \rvert = C + \mu \sigma_N^\prime
+\end{equation}
+
+#### 7.10
+\begin{equation}
+\sigma_1 = \lbrack \sqrt{\mu^2 + 1} + \mu \rbrack^2 \sigma_3 + 2 C \lbrack \sqrt{\mu^2 + 1} + \mu \rbrack
+\end{equation}
+
+#### 7.11
+Check *max* subscript versus superscript, check scalar product:
+\begin{equation}
+M_0^{max} = G \cdot V
+\end{equation}
+
+#### 7.12
+\begin{equation}
+M_{max} = M_C + \frac{1}{b} \log_{10} N
+\end{equation}
+
+#### 7.13
+\begin{equation}
+\Sigma = \log_{10} N - \log_{10} V + b M_C
+\end{equation}
+
+#### 7.14
+\begin{equation}
+M_{max} = \frac{1}{b} (\Sigma + \log_{10} V)
+\end{equation}
+
+The following paragraph uses some in-text equations, which can be rendered $\Delta M \sim 0.4$ and $M_0^{max} \propto V^{\frac{2}{3b}}$.  Here, it may be best to use the horizontal superscript fraction to avoid ambiguity with the position of the *b*.  Additionally, $M_0^{max} \propto V^{\frac{2}{3}}$ and $M_0^{max}$, although, these may be able to be rendered in Word.  
+
+Another use of $\TeX$ is with the library, latex2exp for labeling plots in R and RStudio.  Here, some conventions need to be explained.  First, in some versions of R, the syntax will use a double-back-slash for symbols; for example:
+```{r}
+library(latex2exp)
+x <- rnorm(100)
+plot(x, xlab = "random numbers", ylab = TeX('$PM_{2.5}(\\mu g/l)$'))
+```
