@@ -13,9 +13,11 @@ gc <- read_csv("AV_85.columns.csv", skip = 17, col_names = TRUE) #load in datafi
 # ^^UNLESS I CAN FIND A WAY TO DO THIS IN R??
 #Make sure Hour column is general format and loads as a number
 
+#Can either manually rename each column -OR- tear apart using strsplit command 
+# strsplit for reference https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/strsplit 
+
 
 # For reference on RStudio growth curves https://rpubs.com/angelov/growthcurver 
-
 
 #want to treat each column as an independent growth curve. 
 ggplot(gc, aes(x = Hour, y = A1)) + geom_point(alpha=0.7) +
