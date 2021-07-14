@@ -6,6 +6,7 @@
 library(tidyverse) # includes ggplot and readr commands
 library(RColorBrewer) # used for wind rose with color code by speed
 library(lubridate) # used for dates, specifically month separation
+library(RColorBrewer)
 
 ## Heinz Field (HFP)
 hfp <- read_csv("https://duq.box.com/shared/static/2cs6xi81xtcmq4mmi46t0v0ev4f2mehs.csv")
@@ -40,13 +41,9 @@ dir.bins <- 36
 
 
 
-
-
-
-
 wind <- array(0, dim = c(speed.bins, dir.bins))
-for (i in 1:nrow(pit)) {
-  j <- ceiling(hfc$dir[i]/10)
+for (i in 1:nrow(hfc)) {
+  j <- ceiling(hfp$dir[i]/10)
   k <- ceiling(hfc$spd[i]/2)
   if(k >6) { #brute force correction for speeds over 12m/s
     k <- 6
@@ -75,7 +72,7 @@ rose <- data.frame(directions, speeds, wind.long)
 ggplot(rose, aes(fill = fct_rev(speeds), x = directions, y = wind.long)) +
   labs(caption = paste("Heinz Field")) +
   geom_bar(position="stack", stat="identity") +
-  scale_fill_brewer("Speed (m/s)", palette = "Blues") +
+  scale_fill_brewer("Speed (m/s)", palette = "Greens") +
   coord_polar(theta = "x", start = 0) +
   scale_x_continuous(breaks = seq(0, 360, 45)) +
   theme_linedraw() +
