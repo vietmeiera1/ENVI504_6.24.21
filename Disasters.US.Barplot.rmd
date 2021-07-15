@@ -1,0 +1,28 @@
+---
+title: "US Disasters"
+author: "Anna Vietmeier"
+date: "7/13/2021"
+output: html_document
+---
+
+```{r include=FALSE}
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+disasters <- read_csv("https://duq.box.com/shared/static/48g71l89th4prmlnmp5wupkksaf29gzy.csv", skip = 6, col_names = TRUE, col_types = "ciifffffcfffffccfffccnnfcccciiiiiiiiiiinnnn")
+
+damages <- disasters %>%
+  filter(Country == "United States of America (the)") %>% #dplyr::filter keeps only rows from USA
+  group_by(Year) %>% #group_by will pass the data sorted by year and will cause summarize to sum by year
+  summarize(tdam = 1e-6 * sum(`Total Damages ('000 US$)`, na.rm = TRUE)) # NOTE: I have changed this to billions USD, it is no longer thousands of dollars.
+```
+
+A plot
+
+```{r echo=FALSE}
+ggplot(damages, aes(x = Year, y = tdam)) +
+  geom_bar(stat = "identity", fill = "steelblue") + 
+  labs(x = "Year", y = "Total Damages (billon USD)") +
+  xlim(1950,2025) +
+  theme(panel.background = element_blank(), panel.border = element_rect(fill = NA), panel.grid.major = element_blank()) 
+```

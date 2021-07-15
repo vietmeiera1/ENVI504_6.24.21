@@ -18,6 +18,8 @@ gc <- read_csv("AV_85.columns.csv", skip = 17, col_names = TRUE) #load in datafi
 
 
 # For reference on RStudio growth curves https://rpubs.com/angelov/growthcurver 
+   
+
 
 #want to treat each column as an independent growth curve. 
 ggplot(gc, aes(x = Hour, y = A1)) + geom_point(alpha=0.7) +
