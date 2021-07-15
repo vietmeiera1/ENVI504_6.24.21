@@ -20,7 +20,7 @@ gc <- read_csv("AV_85.columns.csv", skip = 17, col_names = TRUE) #load in datafi
 # For reference on RStudio growth curves https://rpubs.com/angelov/growthcurver 
    
 
-
+## GROWTH CONDITION: AV1 in R2A pH 4.0 30C 1:25 subculture
 #want to treat each column as an independent growth curve. 
 ggplot(gc, aes(x = Hour, y = A1)) + geom_point(alpha=0.7) +
   labs(x = "Hours", y = "OD600 - Log 10") +
@@ -32,6 +32,59 @@ ggplot(gc, aes(x = Hour, y = A1)) + geom_point(alpha=0.7) +
 # to make log 10 scale, scale_y_log10()
 
 # can I loop this to do each column?
+
+
+ggplot(gc, aes(x = Hour, y = B1)) + geom_point(alpha=0.7) +
+  labs(x = "Hours", y = "OD600 - Log 10") +
+  ggtitle("AV1 R2A pH 4.0 30C 1:25 subculture") +
+  scale_y_log10()
+
+ggplot(gc, aes(x = Hour, y = C1)) + geom_point(alpha=0.7) +
+  labs(x = "Hours", y = "OD600 - Log 10") +
+  ggtitle("AV1 R2A pH 4.0 30C 1:25 subculture") +
+  scale_y_log10()
+
+ggplot(gc, aes(x = Hour, y = D1)) + geom_point(alpha=0.7) +
+  labs(x = "Hours", y = "OD600 - Log 10") +
+  ggtitle("AV1 R2A pH 4.0 30C 1:25 subculture") +
+  scale_y_log10()
+
+ggplot(gc, aes(x = Hour, y = E1)) + geom_point(alpha=0.7) +
+  labs(x = "Hours", y = "OD600 - Log 10") +
+  ggtitle("AV1 R2A pH 4.0 30C 1:25 subculture") +
+  scale_y_log10()
+
+ggplot(gc, aes(x = Hour, y = F1)) + geom_point(alpha=0.7) +
+  labs(x = "Hours", y = "OD600 - Log 10") +
+  ggtitle("AV1 R2A pH 4.0 30C 1:25 subculture") +
+  scale_y_log10()
+
+ggplot(gc, aes(x = Hour, y = G1)) + geom_point(alpha=0.7) +
+  labs(x = "Hours", y = "OD600 - Log 10") +
+  ggtitle("AV1 R2A pH 4.0 30C 1:25 subculture") +
+  scale_y_log10()
+
+ggplot(gc, aes(x = Hour, y = H1)) + geom_point(alpha=0.7) +
+  labs(x = "Hours", y = "OD600 - Log 10") +
+  ggtitle("AV1 R2A pH 4.0 30C 1:25 subculture") +
+  scale_y_log10()
+
+
+x <- mean(cbind(gc$A1, gc$B1, gc$C1, gc$D1, gc$E1, gc$F1, gc$G1, gc$H1), trim = TRUE, na.rm = TRUE)
+##This does not work, it thinks the second item should be TRIM
+
+
+A1 <- gc$A1
+B1 <- gc$B1
+mean("AV1", "B1")
+# This also does not work, it says it is not logical or numeric 
+
+
+
+
+
+
+
 
 ggplot(gc, aes(x = Hour, y = A2)) + geom_point(alpha=2.0)
 
