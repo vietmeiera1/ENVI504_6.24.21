@@ -21,6 +21,8 @@ gc <- read_csv("AV_85.columns.csv", locale = locale(encoding = "Latin1"), skip =
 # strsplit for reference https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/strsplit 
 
 # For reference on RStudio growth curves https://rpubs.com/angelov/growthcurver 
+# based on the Growthcurver package by Sprouffske et. al.
+# https://www.ncbi.nlm.nih.gov/pubmed/27094401
 
 
 ## GROWTH CONDITION: AV1 in R2A pH 4.0 30C 1:25 subculture
