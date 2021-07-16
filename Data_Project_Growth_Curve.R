@@ -2,23 +2,26 @@
 #Using data collected from a growth curve done on the plate reader with AV1 
 
 install.packages("growthcurver")
+install.packages("purrr")
 
 library(readr) 
 library(dplyr)
 library(ggplot2)
 library(growthcurver)
+library(purrr)
 
-gc <- read_csv("AV_85.columns.csv", skip = 17, col_names = TRUE) #load in datafile. Skip 1st 17 rows. Column names listed
+gc <- read_csv("AV_85.columns.csv", locale = locale(encoding = "Latin1"), skip = 17, col_names = TRUE) #load in datafile. Skip 1st 17 rows. Column names listed
 #BEFORE loading file, manually change time to hour
 # ^^UNLESS I CAN FIND A WAY TO DO THIS IN R??
 #Make sure Hour column is general format and loads as a number
+#Latin1 was added, as I was getting an error code later in the doc
+# The error was due to the file being loaded in and the letters being recognized in greek 
 
 #Can either manually rename each column -OR- tear apart using strsplit command 
 # strsplit for reference https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/strsplit 
 
-
 # For reference on RStudio growth curves https://rpubs.com/angelov/growthcurver 
-   
+
 
 ## GROWTH CONDITION: AV1 in R2A pH 4.0 30C 1:25 subculture
 #want to treat each column as an independent growth curve. 
@@ -32,6 +35,25 @@ ggplot(gc, aes(x = Hour, y = A1)) + geom_point(alpha=0.7) +
 # to make log 10 scale, scale_y_log10()
 
 # can I loop this to do each column?
+
+model.wt <- SummarizeGrowth(gc$Hour, gc$A1)
+model.wt$vals
+##This gives you all the values, growth rate, etc. 
+
+predict(model.wt$model)
+#gives you the predicted OD values according to the model
+#this will be needed for the trendline on the scatter plot 
+
+
+growth.values.plate <- SummarizeGrowthByPlate(gc) 
+#Growthcurver package has a function the can run the fit for many samples
+
+
+
+
+
+
+
 
 
 ggplot(gc, aes(x = Hour, y = B1)) + geom_point(alpha=0.7) +
@@ -78,6 +100,7 @@ A1 <- gc$A1
 B1 <- gc$B1
 mean("AV1", "B1")
 # This also does not work, it says it is not logical or numeric 
+
 
 
 
