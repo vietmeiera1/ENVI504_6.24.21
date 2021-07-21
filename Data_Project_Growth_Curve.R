@@ -9,6 +9,8 @@ library(dplyr)
 library(ggplot2)
 library(growthcurver)
 library(purrr)
+library(matrixStats)
+library(reshape2)
 
 setwd("~/Documents/Duquesne/Year_2_F20_S21_U21/Summer 2021/ENVI 404:504 Computer Tools for Scientists Excel & R/RStudio/ENVI504_6.24.21")
 
@@ -24,8 +26,8 @@ gc <- read_csv("AV_85.columns.csv", locale = locale(encoding = "Latin1"), skip =
 # strsplit for reference https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/strsplit 
 
 
-
-
+###############################################################################
+## Condition 1
 
 ## GROWTH CONDITION: AV1 in R2A pH 4.0 30C 1:25 subculture
 #want to treat each column as an independent growth curve. 
@@ -44,75 +46,128 @@ ggplot(gc, aes(x = Time, y = A1)) + geom_point(alpha=0.7) +
 # theme(aspect.ratio = 1) ...creates a square sized plit
 #  theme(panel.background = element_rect(fill = "white", colour = "black")) + ...makes background white
 
-ggplot(gc, aes(x = Hour, y = B1)) + geom_point(alpha=0.7) +
+ggplot(gc, aes(x = Time, y = B1)) + geom_point(alpha=0.7) +
   labs(x = "Hours", y = "OD600 - Log 10") +
   ggtitle("AV1 R2A pH 4.0 30C 1:25 subculture") +
   scale_y_log10()
 
-ggplot(gc, aes(x = Hour, y = C1)) + geom_point(alpha=0.7) +
+ggplot(gc, aes(x = Time, y = C1)) + geom_point(alpha=0.7) +
   labs(x = "Hours", y = "OD600 - Log 10") +
   ggtitle("AV1 R2A pH 4.0 30C 1:25 subculture") +
   scale_y_log10()
 
-ggplot(gc, aes(x = Hour, y = D1)) + geom_point(alpha=0.7) +
+ggplot(gc, aes(x = Time, y = D1)) + geom_point(alpha=0.7) +
   labs(x = "Hours", y = "OD600 - Log 10") +
   ggtitle("AV1 R2A pH 4.0 30C 1:25 subculture") +
   scale_y_log10()
 
-ggplot(gc, aes(x = Hour, y = E1)) + geom_point(alpha=0.7) +
+ggplot(gc, aes(x = Time, y = E1)) + geom_point(alpha=0.7) +
   labs(x = "Hours", y = "OD600 - Log 10") +
   ggtitle("AV1 R2A pH 4.0 30C 1:25 subculture") +
   scale_y_log10()
 
-ggplot(gc, aes(x = Hour, y = F1)) + geom_point(alpha=0.7) +
+ggplot(gc, aes(x = Time, y = F1)) + geom_point(alpha=0.7) +
   labs(x = "Hours", y = "OD600 - Log 10") +
   ggtitle("AV1 R2A pH 4.0 30C 1:25 subculture") +
   scale_y_log10()
 
-ggplot(gc, aes(x = Hour, y = G1)) + geom_point(alpha=0.7) +
+ggplot(gc, aes(x = Time, y = G1)) + geom_point(alpha=0.7) +
   labs(x = "Hours", y = "OD600 - Log 10") +
   ggtitle("AV1 R2A pH 4.0 30C 1:25 subculture") +
   scale_y_log10()
 
-ggplot(gc, aes(x = Hour, y = H1)) + geom_point(alpha=0.7) +
+ggplot(gc, aes(x = Time, y = H1)) + geom_point(alpha=0.7) +
   labs(x = "Hours", y = "OD600 - Log 10") +
   ggtitle("AV1 R2A pH 4.0 30C 1:25 subculture") +
   scale_y_log10()
 
+####
 
-# x <- mean(cbind(gc$A1, gc$B1, gc$C1, gc$D1, gc$E1, gc$F1, gc$G1, gc$H1), na.rm = TRUE)
-# ##This does not work, it thinks the second item should be TRIM
-# 
-# A1 <- gc$A1
-# B1 <- gc$B1
-# mean("AV1", "B1")
-# # This also does not work, it says it is not logical or numeric 
+##Combine replicates onto the same scatter plot 
+ggplot(gc, aes(x = Time)) + 
+  geom_point(aes(y=A1, color="A1")) +
+  geom_point(aes(y=B1, color="B1")) +
+  geom_point(aes(y=C1, color="C1")) +
+  geom_point(aes(y=D1, color="D1")) +
+  geom_point(aes(y=E1, color="E1")) +
+  geom_point(aes(y=F1, color="F1")) +
+  geom_point(aes(y=G1, color="G1")) +
+  geom_point(aes(y=H1, color="H1")) +
+  labs(x = "Hours", y = "OD600 - Log 10") 
+#This would allow for a quick visualization of how the growth curves compare
+#prior to taking the mean and may identify potential outliers 
 
+
+
+
+##To get the mean & standard deviation of replicates
 gc_1 <- gc %>%
   rowwise() %>%
   mutate(
-    m = mean(c(A1,B1,C1,D1,E1,F1,G1,H1))
+    m = mean(c(A1,B1,C1,D1,E1,F1,G1,H1)),
+    sd = sd(c(A1,B1,C1,D1,E1,F1,G1,H1))
     )
 #Will add an additional column named "m" to your df that takes the average of A1, B1...
+#sd will calculate the standard deviation of the replicates
 
-library(matrixStats)
-gc_1 <- gc_1 %>%
-  rowwise() %>%
-  mutate(
-    sd = sd(c(A1,B1,C1,D1,E1,F1,G1,H1))
-  )
-#This will calculate the standard deviation of the replicates
 
-ggplot(gc_1, aes(x = Time, y = m)) + geom_point(alpha=0.7) +
-  labs(x = "Hours", y = "OD600 - Log 10") +
-  ggtitle("AV1 R2A pH 4.0 30C 1:25 subculture") +
+##To plot the average & sd of the 8 replicates
+ggplot(gc_1, aes(x = Time, y = m)) + geom_point(alpha=0.7, color = "blue") +
+  
+  
+  labs(x = "Time (Hours)", y = "OD600 (Log 10)") +
+  theme(axis.title = element_text(size = 15)) +
+  scale_x_continuous(breaks = seq(0, 28, by = 2)) +
   scale_y_log10() +
+  
+  ggtitle("AV1 R2A pH 4.0 30C 1:25 subculture") +
+  theme(plot.title = element_text(size = 16)) +
+  theme(plot.title = element_text(hjust = .5)) +
+  
+  theme(panel.background = element_rect(fill = "white", colour = "black")) +
+  theme(aspect.ratio = 1) +
+
+  theme(
+    panel.grid.major.x = element_line(color = "grey80"),
+    panel.grid.minor.x = element_line(colour = "grey85"),
+    ) +
+  
   geom_errorbar(aes(ymin=m-sd, ymax=m+sd), width=.1,
-                position=position_dodge(.9)) 
+                position=position_dodge(.9))
 #This graphs the mean & standard deviation of the 8 replicates 
 
 
 
+#theme(axis.text = element_text(face = "plain", size = 15)) +
+#  scale_x_continuous(minor_breaks = seq(0,5, 0.1), colour) +
+#  grids(linetype = "dashed")
+
+
+ 
+
+
+
+
+
+model.wt <- SummarizeGrowth(gc_1$Time, gc_1$m)
+model.wt$vals
+##This gives you all the values, growth rate, etc. 
+
+
+##Zoom in on exponential phase of growth to get doubling time
+  
+ex1 <- gc_1
+# From the graph, estimate the approximate exponential phase and select that time window
+# approx. time 1 hr - 10 hr 
+#can i use an equation to tell me when my doubling time is occuring?
+# N1 = cells at time 1
+# n2 = cells at time 2
+# doubling time is when N2/N1 is equal to 2 
+
+
+stat_smooth(method = "lm")
+#stat_smooth(method = "lm") .... adds an exponential trend line
+#this will appear straight since its on a log scale y axis. 
 
 
 
@@ -121,6 +176,10 @@ ggplot(gc_1, aes(x = Time, y = m)) + geom_point(alpha=0.7) +
 
 
 
+
+
+###############################################################################
+## Condition 2 
 
 ggplot(gc, aes(x = Hour, y = A2)) + geom_point(alpha=2.0)
 
