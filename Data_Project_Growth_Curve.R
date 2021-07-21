@@ -80,7 +80,6 @@ ggplot(gc, aes(x = Time, y = H1)) + geom_point(alpha=0.7) +
   labs(x = "Hours", y = "OD600 - Log 10") +
   ggtitle("AV1 R2A pH 4.0 30C 1:25 subculture") +
   scale_y_log10()
-
 ####
 
 ##Combine replicates onto the same scatter plot 
@@ -96,8 +95,6 @@ ggplot(gc, aes(x = Time)) +
   labs(x = "Hours", y = "OD600 - Log 10") 
 #This would allow for a quick visualization of how the growth curves compare
 #prior to taking the mean and may identify potential outliers 
-
-
 
 
 ##To get the mean & standard deviation of replicates
@@ -135,39 +132,108 @@ ggplot(gc_1, aes(x = Time, y = m)) + geom_point(alpha=0.7, color = "blue") +
   geom_errorbar(aes(ymin=m-sd, ymax=m+sd), width=.1,
                 position=position_dodge(.9))
 #This graphs the mean & standard deviation of the 8 replicates 
-
-
-
-#theme(axis.text = element_text(face = "plain", size = 15)) +
-#  scale_x_continuous(minor_breaks = seq(0,5, 0.1), colour) +
 #  grids(linetype = "dashed")
 
 
- 
 
-
-
-
-
-model.wt <- SummarizeGrowth(gc_1$Time, gc_1$m)
-model.wt$vals
+model.gc_1 <- SummarizeGrowth(gc_1$Time, gc_1$m)
+model.gc_1$vals
 ##This gives you all the values, growth rate, etc. 
 
 
+
+
+
+
 ##Zoom in on exponential phase of growth to get doubling time
+ex1 <- gc_1[c(5:26),c(1,99)]
+#creates a dataset with just time & mean of condition 1
+#c(1:105)...rows 1:105
+#c(1,99)...columns 1&99
+
+install.packages("ggpubr")
+library(ggpubr)
+install.packages("Hmisc")
+install.packages("broom")
+library(broom) 
+library(lattice)
+library(Hmisc)
+install.packages("ggpmisc")
+library(ggpmisc)
+
+
+#Plot just the exponential phase of the growth curve
+ggplot(ex1, aes(x = Time, y = m)) + geom_point(alpha=0.7, color = "blue") +
+  scale_y_log10() +
+  stat_smooth(method = 'nls', 
+              method.args = list(start = c(a=1, b=1)), 
+              formula = y~a*exp(b*x), 
+              se = FALSE) +
+  stat_regline_equation(
+    label.x = 1, 
+    label.y = log(.545), 
+    aes(label = ..eq.label..)) +
+  stat_regline_equation(label.x = 1, aes(label = ..rr.label..))
   
-ex1 <- gc_1
+ 
+# stat_poly_eq(formula = formula, parse = TRUE, label.y = "bottom", lable.x ="right")
+  
+  #  stat_poly_eq(mapping = NULL,
+  #              data = NULL,
+  #              geom = "text_npc",
+  #              position = "identity",
+  #              formula = NULL,
+  #              eq.with.lhs = TRUE,
+  #              eq.x.rhs = NULL,
+  #              coef.digits = 3,
+  #              rr.digits = 2,
+  #              f.digits = 3,
+  #              p.digits = 3,
+  #              label.x = "left",
+  #              label.y = "top",
+  #              label.x.npc = NULL,
+  #              label.y.npc = NULL,
+  #              hstep = 0,
+  #              vstep = NULL,
+  #              output.type = "expression",
+  #              na.rm = FALSE,
+  #              show.legend = FALSE,
+  #              inherit.aes = TRUE
+  # )
+  
+  #geom_text(aes(x=1, y=log(.545), label = eq), parse = TRUE)
+  
+  # stat_poly_eq(aes(label = stat(eq.label)), formula = formula, parse = TRUE)  
+  # stat_poly_eq(aes(label = stat(adj.rr.label)), formula = formula, parse = TRUE) 
+  
+
+  # ggtitle(lm_eq)
+  # geom_text(x=1, y=log(.545), label =lmEqn(ex1), parse = TRUE)
+
+  # 
+##This shows a linear line equation on the graph and I need it to show an exponential line equation.   
+  
+  # # stat_fit_tidy(method = "nls", 
+  #               method.args = list(formula = y~A*exp(B*x)),
+  #               size = 3,
+  #               label.x = "center",
+  #               label.y = "bottom",
+  #               parse = TRUE)
+
+#gc_1stat <- lm(log(y)~ x)
+#summary(gc_1stat)
+
+
 # From the graph, estimate the approximate exponential phase and select that time window
 # approx. time 1 hr - 10 hr 
 #can i use an equation to tell me when my doubling time is occuring?
 # N1 = cells at time 1
 # n2 = cells at time 2
 # doubling time is when N2/N1 is equal to 2 
-
-
-stat_smooth(method = "lm")
 #stat_smooth(method = "lm") .... adds an exponential trend line
 #this will appear straight since its on a log scale y axis. 
+
+
 
 
 
