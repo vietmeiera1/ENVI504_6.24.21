@@ -94,7 +94,8 @@ ggplot(gc, aes(x = Time)) +
   geom_point(aes(y=H1, color="H1")) +
   labs(x = "Hours", y = "OD600 - Log 10") 
 #This would allow for a quick visualization of how the growth curves compare
-#prior to taking the mean and may identify potential outliers 
+#prior to taking the mean and may identify potential outliers
+# Determine if their is significant differences between replicates
 
 
 ##To get the mean & standard deviation of replicates
@@ -110,7 +111,6 @@ gc_1 <- gc %>%
 
 ##To plot the average & sd of the 8 replicates
 ggplot(gc_1, aes(x = Time, y = m)) + geom_point(alpha=0.7, color = "blue") +
-  
   
   labs(x = "Time (Hours)", y = "OD600 (Log 10)") +
   theme(axis.title = element_text(size = 15)) +
@@ -136,9 +136,6 @@ ggplot(gc_1, aes(x = Time, y = m)) + geom_point(alpha=0.7, color = "blue") +
 
 
 
-model.gc_1 <- SummarizeGrowth(gc_1$Time, gc_1$m)
-model.gc_1$vals
-##This gives you all the values, growth rate, etc. 
 
 
 
@@ -164,64 +161,90 @@ library(ggpmisc)
 
 #Plot just the exponential phase of the growth curve
 ggplot(ex1, aes(x = Time, y = m)) + geom_point(alpha=0.7, color = "blue") +
+  
   scale_y_log10() +
+  labs(x = "Time (Hours)", y = "OD600 (Log 10)") +
+  theme(axis.title = element_text(size = 15)) +
+  
+  ggtitle("Exponential Phase AV1 R2A pH 4.0 30C 1:25 subculture") +
+  theme(plot.title = element_text(size = 16)) +
+  theme(plot.title = element_text(hjust = .5)) +
+  
+  theme(panel.background = element_rect(fill = "white", colour = "black")) +
+  theme(aspect.ratio = 1) +
+  
+  
+  theme(
+    panel.grid.major.x = element_line(color = "grey80"),
+    panel.grid.minor.x = element_line(colour = "grey85"),
+  ) +
+  
   stat_smooth(method = 'nls', 
               method.args = list(start = c(a=1, b=1)), 
               formula = y~a*exp(b*x), 
               se = FALSE) +
+  
+  stat_regline_equation(label.x = 1, aes(label = ..rr.label..)) +
+
   stat_regline_equation(
-    label.x = 1, 
-    label.y = log(.545), 
-    aes(label = ..eq.label..)) +
-  stat_regline_equation(label.x = 1, aes(label = ..rr.label..))
+      label.x = 1, 
+      label.y = log(.545), 
+      aes(label = ..eq.label..))
   
  
-# stat_poly_eq(formula = formula, parse = TRUE, label.y = "bottom", lable.x ="right")
+
+
+#Plot just the exponential phase of the growth curve
+x <- ex1$Time
+y <- ex1$m
+
+df <- data.frame(x, y)
+
+exp.mod    <- lm(log(y) ~ x, df)
+
+new_x      <- seq(min(x), max(x), 0.01)
+prediction <- exp(predict(exp.mod, newdata = list(x = new_x)))
+exp_line   <- data.frame(x = new_x, y = prediction)
+
+eq <- paste0('paste(y, " = ", italic(e^{',  round(exp.mod$coefficients[2], 2), 
+             "*x ~~+~~ ", round(exp.mod$coefficients[1], 2),
+             '}), ~~~~~~~~R^2~ "="~', round(summary(exp.mod)$r.squared, 2), ")")
+
+ex1_plot <- ggplot(data = df, mapping = aes(x, y)) + 
+  geom_point(alpha=0.7, color = "blue") +
   
-  #  stat_poly_eq(mapping = NULL,
-  #              data = NULL,
-  #              geom = "text_npc",
-  #              position = "identity",
-  #              formula = NULL,
-  #              eq.with.lhs = TRUE,
-  #              eq.x.rhs = NULL,
-  #              coef.digits = 3,
-  #              rr.digits = 2,
-  #              f.digits = 3,
-  #              p.digits = 3,
-  #              label.x = "left",
-  #              label.y = "top",
-  #              label.x.npc = NULL,
-  #              label.y.npc = NULL,
-  #              hstep = 0,
-  #              vstep = NULL,
-  #              output.type = "expression",
-  #              na.rm = FALSE,
-  #              show.legend = FALSE,
-  #              inherit.aes = TRUE
-  # )
+  scale_y_log10() +
+  labs(x = "Time (Hours)", y = "OD600 (Log 10)") +
+  theme(axis.title = element_text(size = 15)) +
   
-  #geom_text(aes(x=1, y=log(.545), label = eq), parse = TRUE)
+  ggtitle("Exponential Phase AV1 R2A pH 4.0 30C 1:25 subculture") +
+  theme(plot.title = element_text(size = 16)) +
+  theme(plot.title = element_text(hjust = .5)) +
   
-  # stat_poly_eq(aes(label = stat(eq.label)), formula = formula, parse = TRUE)  
-  # stat_poly_eq(aes(label = stat(adj.rr.label)), formula = formula, parse = TRUE) 
+  theme(panel.background = element_rect(fill = "white", colour = "black")) +
+  theme(aspect.ratio = 1) +
+  
+  theme(
+    panel.grid.major.x = element_line(color = "grey80"),
+    panel.grid.minor.x = element_line(colour = "grey85"),
+  ) +
+  
+  geom_line(data = exp_line) +
+  geom_text(aes(x = min(x) + 0.1 * diff(range(x)), 
+                y = min(y) + 0.9 * diff(range(y)), label = eq), 
+            parse = TRUE, size = 5, check_overlap = TRUE, hjust = 0)
+
+ex1_plot
+
+
   
 
-  # ggtitle(lm_eq)
-  # geom_text(x=1, y=log(.545), label =lmEqn(ex1), parse = TRUE)
 
-  # 
-##This shows a linear line equation on the graph and I need it to show an exponential line equation.   
-  
-  # # stat_fit_tidy(method = "nls", 
-  #               method.args = list(formula = y~A*exp(B*x)),
-  #               size = 3,
-  #               label.x = "center",
-  #               label.y = "bottom",
-  #               parse = TRUE)
+ 
 
-#gc_1stat <- lm(log(y)~ x)
-#summary(gc_1stat)
+
+
+
 
 
 # From the graph, estimate the approximate exponential phase and select that time window
@@ -262,6 +285,7 @@ ggplot(gc, aes(x = Hour, y = A2)) + geom_point(alpha=2.0)
 model.wt <- SummarizeGrowth(gc$Time, gc$A1)
 model.wt$vals
 ##This gives you all the values, growth rate, etc. 
+
 
 predict(model.wt$model)
 #gives you the predicted OD values according to the model
