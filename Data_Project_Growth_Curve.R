@@ -12,6 +12,16 @@ library(purrr)
 library(matrixStats)
 library(reshape2)
 
+install.packages("ggpubr")
+library(ggpubr)
+install.packages("Hmisc")
+install.packages("broom")
+library(broom) 
+library(lattice)
+library(Hmisc)
+install.packages("ggpmisc")
+library(ggpmisc)
+
 setwd("~/Documents/Duquesne/Year_2_F20_S21_U21/Summer 2021/ENVI 404:504 Computer Tools for Scientists Excel & R/RStudio/ENVI504_6.24.21")
 
 gc <- read_csv("AV_85.columns.csv", locale = locale(encoding = "Latin1"), skip = 17, col_names = TRUE) #load in datafile. Skip 1st 17 rows. Column names listed
@@ -27,7 +37,7 @@ gc <- read_csv("AV_85.columns.csv", locale = locale(encoding = "Latin1"), skip =
 
 
 ###############################################################################
-## Condition 1
+## Condition 1 ################################################################
 
 ## GROWTH CONDITION: AV1 in R2A pH 4.0 30C 1:25 subculture
 #want to treat each column as an independent growth curve. 
@@ -92,9 +102,27 @@ ggplot(gc, aes(x = Time)) +
   geom_point(aes(y=F1, color="F1")) +
   geom_point(aes(y=G1, color="G1")) +
   geom_point(aes(y=H1, color="H1")) +
-  labs(x = "Hours", y = "OD600 - Log 10") 
-#This would allow for a quick visualization of how the growth curves compare
-#prior to taking the mean and may identify potential outliers
+  
+  scale_y_log10() +
+  scale_x_continuous(breaks = seq(0, 28, by = 2)) +
+  labs(x = "Hours", y = "OD600 (Log 10)") +
+  
+  theme(panel.background = element_rect(fill = "white", colour = "black")) +
+  theme(aspect.ratio = 1) +
+  theme(
+    panel.grid.major.x = element_line(color = "grey80", linetype = "dashed"),
+    panel.grid.minor.x = element_line(colour = "grey85", linetype = "dashed"),
+  ) +
+  
+  
+  ggtitle("AV1 R2A pH 4.0 30C 1:25 subculture replicates") +
+  theme(plot.title = element_text(size = 16)) +
+  theme(plot.title = element_text(hjust = .5)) +
+  
+  theme(axis.text = element_text(face = "plain", size = 12)) + 
+  theme(axis.title = element_text(size = 15)) 
+#This allows for a quick visualization of how the growth curves compare
+#May identify potential outliers
 # Determine if their is significant differences between replicates
 
 
@@ -125,9 +153,11 @@ ggplot(gc_1, aes(x = Time, y = m)) + geom_point(alpha=0.7, color = "blue") +
   theme(aspect.ratio = 1) +
 
   theme(
-    panel.grid.major.x = element_line(color = "grey80"),
+    panel.grid.major.x = element_line(color = "grey80", linetype = "dashed"),
     panel.grid.minor.x = element_line(colour = "grey85", linetype = "dashed"),
     ) +
+  
+  theme(axis.text = element_text(face = "plain", size = 12)) + 
   
   geom_errorbar(aes(ymin=m-sd, ymax=m+sd), width=.1,
                 position=position_dodge(.9))
@@ -193,14 +223,14 @@ ex1_plot <- ggplot(data = df, mapping = aes(x, y)) +
   theme(aspect.ratio = 1) +
   
   theme(
-    panel.grid.major.x = element_line(color = "grey80"),
-    panel.grid.minor.x = element_line(colour = "grey85"),
+    panel.grid.major.x = element_line(color = "grey80", linetype = "dashed"),
+    panel.grid.minor.x = element_line(colour = "grey85", linetype = "dashed"),
   ) +
   
-  geom_line(data = exp_line) +
-  geom_text(aes(x = min(x) + 0.1 * diff(range(x)),
-                y = min(y) + 0.9 * diff(range(y)), label = eq),
-            parse = TRUE, size = 5, check_overlap = TRUE, hjust = 0)
+  geom_line(data = exp_line)
+  # #geom_text(aes(x = min(x) + 0.1 * diff(range(x)),
+  #               y = min(y) + 0.9 * diff(range(y)), label = eq),
+  #           parse = TRUE, size = 5, check_overlap = TRUE, hjust = 0)
 
 ex1_plot
 
@@ -216,8 +246,562 @@ dt <- log(2)/B
 print(dt)
 
 
+###############################################################################
+## Condition 2 ################################################################
 
-##### WRITE DOUBLE#####
+
+## GROWTH CONDITION: AV1 in R2A pH 4.0 30C 1:25 subculture
+#want to treat each column as an independent growth curve. 
+ggplot(gc, aes(x = Time, y = A2)) + geom_point(alpha=0.7) +
+  labs(x = "Hours", y = "OD600 - Log 10") +
+  ggtitle("AV1 R2A pH 4.0 30C 1:25 subculture") +
+  theme(panel.background = element_rect(fill = "white", colour = "black")) +
+  theme(aspect.ratio = 1) +
+  theme(axis.text = element_text(face = "plain", size = 12))
+scale_y_log10() 
+#the alpha # tell you how dark to make the point - the greater the number, the darker the point. 
+# labs = labels for each axis 
+# ggtitle() = title of the graph
+# to make log 10 scale, scale_y_log10()
+# can I loop this to do each column?
+# theme(aspect.ratio = 1) ...creates a square sized plit
+#  theme(panel.background = element_rect(fill = "white", colour = "black")) + ...makes background white
+
+ggplot(gc, aes(x = Time, y = B1)) + geom_point(alpha=0.7) +
+  labs(x = "Hours", y = "OD600 - Log 10") +
+  ggtitle("AV1 R2A pH 4.0 30C 1:25 subculture") +
+  scale_y_log10()
+
+ggplot(gc, aes(x = Time, y = C1)) + geom_point(alpha=0.7) +
+  labs(x = "Hours", y = "OD600 - Log 10") +
+  ggtitle("AV1 R2A pH 4.0 30C 1:25 subculture") +
+  scale_y_log10()
+
+ggplot(gc, aes(x = Time, y = D1)) + geom_point(alpha=0.7) +
+  labs(x = "Hours", y = "OD600 - Log 10") +
+  ggtitle("AV1 R2A pH 4.0 30C 1:25 subculture") +
+  scale_y_log10()
+
+ggplot(gc, aes(x = Time, y = E1)) + geom_point(alpha=0.7) +
+  labs(x = "Hours", y = "OD600 - Log 10") +
+  ggtitle("AV1 R2A pH 4.0 30C 1:25 subculture") +
+  scale_y_log10()
+
+ggplot(gc, aes(x = Time, y = F1)) + geom_point(alpha=0.7) +
+  labs(x = "Hours", y = "OD600 - Log 10") +
+  ggtitle("AV1 R2A pH 4.0 30C 1:25 subculture") +
+  scale_y_log10()
+
+ggplot(gc, aes(x = Time, y = G1)) + geom_point(alpha=0.7) +
+  labs(x = "Hours", y = "OD600 - Log 10") +
+  ggtitle("AV1 R2A pH 4.0 30C 1:25 subculture") +
+  scale_y_log10()
+
+ggplot(gc, aes(x = Time, y = H1)) + geom_point(alpha=0.7) +
+  labs(x = "Hours", y = "OD600 - Log 10") +
+  ggtitle("AV1 R2A pH 4.0 30C 1:25 subculture") +
+  scale_y_log10()
+####
+
+##Combine replicates onto the same scatter plot 
+ggplot(gc, aes(x = Time)) + 
+  geom_point(aes(y=A2, color="A2")) +
+  geom_point(aes(y=B2, color="B2")) +
+  geom_point(aes(y=C2, color="C2")) +
+  geom_point(aes(y=D2, color="D2")) +
+  geom_point(aes(y=E2, color="E2")) +
+  geom_point(aes(y=F2, color="F2")) +
+  geom_point(aes(y=G2, color="G2")) +
+  geom_point(aes(y=H2, color="H2")) +
+  
+  scale_y_log10() +
+  scale_x_continuous(breaks = seq(0, 28, by = 2)) +
+  labs(x = "Hours", y = "OD600 (Log 10)") +
+  
+  theme(panel.background = element_rect(fill = "white", colour = "black")) +
+  theme(aspect.ratio = 1) +
+  theme(
+    panel.grid.major.x = element_line(color = "grey80", linetype = "dashed"),
+    panel.grid.minor.x = element_line(colour = "grey85", linetype = "dashed"),
+  ) +
+  
+  
+  ggtitle("AV1 R2A pH 4.0 30C 1:50 subculture replicates") +
+  theme(plot.title = element_text(size = 16)) +
+  theme(plot.title = element_text(hjust = .5)) +
+  
+  theme(axis.text = element_text(face = "plain", size = 12)) + 
+  theme(axis.title = element_text(size = 15)) 
+#This allows for a quick visualization of how the growth curves compare
+#May identify potential outliers
+# Determine if their is significant differences between replicates
+
+
+##To get the mean & standard deviation of replicates
+gc_2 <- gc %>%
+  rowwise() %>%
+  mutate(
+    m = mean(c(A2,B2,C2,D2,E2,F2,G2,H2)),
+    sd = sd(c(A2,B2,C2,D2,E2,F2,G2,H2))
+  )
+#Will add an additional column named "m" to your df that takes the average of A1, B1...
+#sd will calculate the standard deviation of the replicates
+
+
+##To plot the average & sd of the 8 replicates
+ggplot(gc_2, aes(x = Time, y = m)) + geom_point(alpha=0.7, color = "blue") +
+  
+  labs(x = "Time (Hours)", y = "OD600 (Log 10)") +
+  theme(axis.title = element_text(size = 15)) +
+  scale_x_continuous(breaks = seq(0, 28, by = 2)) +
+  scale_y_log10() +
+  
+  ggtitle("AV1 R2A pH 4.0 30C 1:50 subculture") +
+  theme(plot.title = element_text(size = 16)) +
+  theme(plot.title = element_text(hjust = .5)) +
+  
+  theme(panel.background = element_rect(fill = "white", colour = "black")) +
+  theme(aspect.ratio = 1) +
+  
+  theme(
+    panel.grid.major.x = element_line(color = "grey80", linetype = "dashed"),
+    panel.grid.minor.x = element_line(colour = "grey85", linetype = "dashed"),
+  ) +
+  
+  theme(axis.text = element_text(face = "plain", size = 12)) + 
+  
+  geom_errorbar(aes(ymin=m-sd, ymax=m+sd), width=.1,
+                position=position_dodge(.9))
+#This graphs the mean & standard deviation of the 8 replicates 
+
+
+
+########## EXPONENTIAL GRAPH ###################
+##Zoom in on exponential phase of growth to get doubling time
+ex2 <- gc_2[c(5:26),c(1,99)]
+#creates a dataset with just time & mean of condition 1
+#c(1:105)...rows 1:105
+#c(1,99)...columns 1&99
+
+install.packages("ggpubr")
+library(ggpubr)
+install.packages("Hmisc")
+install.packages("broom")
+library(broom) 
+library(lattice)
+library(Hmisc)
+install.packages("ggpmisc")
+library(ggpmisc)
+
+#Plot just the exponential phase of the growth curve
+x.2 <- ex2$Time
+y.2 <- ex2$m
+
+df2 <- data.frame(x.2, y.2)
+
+exp.mod2    <- lm(log(y.2) ~ x.2, df2)
+
+new_x2      <- seq(min(x.2), max(x.2), 0.01)
+prediction2 <- exp(predict(exp.mod2, newdata = list(x.2 = new_x2)))
+exp_line2   <- data.frame(x.2 = new_x2, y.2 = prediction2)
+
+# eq <- paste0('paste(y, " = "', round(exp(exp.mod$coefficients[1], 2)), 'italic(e^{',  round(exp.mod$coefficients[2], 2), 
+#              "*x ~~+~~ ", 
+#              '}), ~~~~~~~~R^2~ "="~', round(summary(exp.mod)$r.squared, 2), ")")
+# eq <- expression("y = ", round(exp(exp.mod$coefficients[1]), 2), "e"^{round(exp.mod$coefficients[2], 2)})
+
+
+eq.2 <- paste0('paste(y, " = ", italic(e{',  round(exp.mod2$coefficients[2], 2),
+             "*x ~~+~~ ", round(exp.mod2$coefficients[1], 2),
+             '}), ~~~~~~~~R^2~ "="~', round(summary(exp.mod2)$r.squared, 2), ")")
+
+# eq <- paste0('paste(y, " = ", italic(e^{',  round(exp.mod$coefficients[2], 2),
+#             "*x ~~+~~ ", round(exp.mod$coefficients[1], 2),
+#             '}), ~~~~~~~~R^2~ "="~', round(summary(exp.mod)$r.squared, 2), ")")
+
+ex2_plot <- ggplot(data = df2, mapping = aes(x.2, y.2)) + 
+  geom_point(alpha=0.7, color = "blue") +
+  
+  scale_y_log10() +
+  labs(x = "Time (Hours)", y = "OD600 (Log 10)") +
+  theme(axis.title = element_text(size = 15)) +
+  
+  ggtitle("Exponential Phase AV1 R2A pH 4.0 30C 1:50 subculture") +
+  theme(plot.title = element_text(size = 16)) +
+  theme(plot.title = element_text(hjust = .5)) +
+  
+  theme(panel.background = element_rect(fill = "white", colour = "black")) +
+  theme(aspect.ratio = 1) +
+  
+  theme(
+    panel.grid.major.x = element_line(color = "grey80", linetype = "dashed"),
+    panel.grid.minor.x = element_line(colour = "grey85", linetype = "dashed"),
+  ) +
+  
+  geom_line(data = exp_line2)
+# #geom_text(aes(x = min(x) + 0.1 * diff(range(x)),
+#               y = min(y) + 0.9 * diff(range(y)), label = eq),
+#           parse = TRUE, size = 5, check_overlap = TRUE, hjust = 0)
+
+ex2_plot
+
+summary(exp.mod2)
+
+R_sq.2 <- round(summary(exp.mod2)$r.squared, 2)
+print(R_sq.2)
+
+B.2 <- as.numeric(round(exp.mod2$coefficients[2], 2))
+print(B.2)
+
+dt.2 <- log(2)/B.2
+print(dt.2)
+
+
+
+###############################################################################
+## Condition 3 ################################################################
+
+
+## GROWTH CONDITION: AV1 in R2A pH 4.0 30C 1:100 subculture
+#want to treat each column as an independent growth curve. 
+ggplot(gc, aes(x = Time, y = A2)) + geom_point(alpha=0.7) +
+  labs(x = "Hours", y = "OD600 - Log 10") +
+  ggtitle("AV1 R2A pH 4.0 30C 1:25 subculture") +
+  theme(panel.background = element_rect(fill = "white", colour = "black")) +
+  theme(aspect.ratio = 1) +
+  theme(axis.text = element_text(face = "plain", size = 12))
+scale_y_log10() 
+#the alpha # tell you how dark to make the point - the greater the number, the darker the point. 
+# labs = labels for each axis 
+# ggtitle() = title of the graph
+# to make log 10 scale, scale_y_log10()
+# can I loop this to do each column?
+# theme(aspect.ratio = 1) ...creates a square sized plit
+#  theme(panel.background = element_rect(fill = "white", colour = "black")) + ...makes background white
+
+ggplot(gc, aes(x = Time, y = B1)) + geom_point(alpha=0.7) +
+  labs(x = "Hours", y = "OD600 - Log 10") +
+  ggtitle("AV1 R2A pH 4.0 30C 1:25 subculture") +
+  scale_y_log10()
+
+ggplot(gc, aes(x = Time, y = C1)) + geom_point(alpha=0.7) +
+  labs(x = "Hours", y = "OD600 - Log 10") +
+  ggtitle("AV1 R2A pH 4.0 30C 1:25 subculture") +
+  scale_y_log10()
+
+ggplot(gc, aes(x = Time, y = D1)) + geom_point(alpha=0.7) +
+  labs(x = "Hours", y = "OD600 - Log 10") +
+  ggtitle("AV1 R2A pH 4.0 30C 1:25 subculture") +
+  scale_y_log10()
+
+ggplot(gc, aes(x = Time, y = E1)) + geom_point(alpha=0.7) +
+  labs(x = "Hours", y = "OD600 - Log 10") +
+  ggtitle("AV1 R2A pH 4.0 30C 1:25 subculture") +
+  scale_y_log10()
+
+ggplot(gc, aes(x = Time, y = F1)) + geom_point(alpha=0.7) +
+  labs(x = "Hours", y = "OD600 - Log 10") +
+  ggtitle("AV1 R2A pH 4.0 30C 1:25 subculture") +
+  scale_y_log10()
+
+ggplot(gc, aes(x = Time, y = G1)) + geom_point(alpha=0.7) +
+  labs(x = "Hours", y = "OD600 - Log 10") +
+  ggtitle("AV1 R2A pH 4.0 30C 1:25 subculture") +
+  scale_y_log10()
+
+ggplot(gc, aes(x = Time, y = H1)) + geom_point(alpha=0.7) +
+  labs(x = "Hours", y = "OD600 - Log 10") +
+  ggtitle("AV1 R2A pH 4.0 30C 1:25 subculture") +
+  scale_y_log10()
+####
+
+##Combine replicates onto the same scatter plot 
+ggplot(gc, aes(x = Time)) + 
+  geom_point(aes(y=A3, color="A3")) +
+  geom_point(aes(y=B3, color="B3")) +
+  geom_point(aes(y=C3, color="C3")) +
+  geom_point(aes(y=D3, color="D3")) +
+  geom_point(aes(y=E3, color="E3")) +
+  geom_point(aes(y=F3, color="F3")) +
+  geom_point(aes(y=G3, color="G3")) +
+  geom_point(aes(y=H3, color="H3")) +
+  
+  scale_y_log10() +
+  scale_x_continuous(breaks = seq(0, 28, by = 2)) +
+  labs(x = "Hours", y = "OD600 (Log 10)") +
+  
+  theme(panel.background = element_rect(fill = "white", colour = "black")) +
+  theme(aspect.ratio = 1) +
+  theme(
+    panel.grid.major.x = element_line(color = "grey80", linetype = "dashed"),
+    panel.grid.minor.x = element_line(colour = "grey85", linetype = "dashed"),
+  ) +
+  
+  
+  ggtitle("AV1 R2A pH 4.0 30C 1:100 subculture replicates") +
+  theme(plot.title = element_text(size = 16)) +
+  theme(plot.title = element_text(hjust = .5)) +
+  
+  theme(axis.text = element_text(face = "plain", size = 12)) + 
+  theme(axis.title = element_text(size = 15)) 
+#This allows for a quick visualization of how the growth curves compare
+#May identify potential outliers
+# Determine if their is significant differences between replicates
+
+
+##To get the mean & standard deviation of replicates
+gc_3 <- gc %>%
+  rowwise() %>%
+  mutate(
+    m = mean(c(A3,B3,C3,D3,E3,F3,G3,H3)),
+    sd = sd(c(A3,B3,C3,D3,E3,F3,G3,H3))
+  )
+#Will add an additional column named "m" to your df that takes the average of A1, B1...
+#sd will calculate the standard deviation of the replicates
+
+
+##To plot the average & sd of the 8 replicates
+ggplot(gc_3, aes(x = Time, y = m)) + geom_point(alpha=0.7, color = "blue") +
+  
+  labs(x = "Time (Hours)", y = "OD600 (Log 10)") +
+  theme(axis.title = element_text(size = 15)) +
+  scale_x_continuous(breaks = seq(0, 28, by = 2)) +
+  scale_y_log10() +
+  
+  ggtitle("AV1 R2A pH 4.0 30C 1:100 subculture") +
+  theme(plot.title = element_text(size = 16)) +
+  theme(plot.title = element_text(hjust = .5)) +
+  
+  theme(panel.background = element_rect(fill = "white", colour = "black")) +
+  theme(aspect.ratio = 1) +
+  
+  theme(
+    panel.grid.major.x = element_line(color = "grey80", linetype = "dashed"),
+    panel.grid.minor.x = element_line(colour = "grey85", linetype = "dashed"),
+  ) +
+  
+  theme(axis.text = element_text(face = "plain", size = 12)) + 
+  
+  geom_errorbar(aes(ymin=m-sd, ymax=m+sd), width=.1,
+                position=position_dodge(.9))
+#This graphs the mean & standard deviation of the 8 replicates 
+
+
+
+########## EXPONENTIAL GRAPH ###################
+##Zoom in on exponential phase of growth to get doubling time
+ex3 <- gc_3[c(5:26),c(1,99)]
+#creates a dataset with just time & mean of condition 1
+#c(1:105)...rows 1:105
+#c(1,99)...columns 1&99
+
+
+
+#Plot just the exponential phase of the growth curve
+x.3 <- ex3$Time
+y.3 <- ex3$m
+
+df3 <- data.frame(x.3, y.3)
+
+exp.mod3    <- lm(log(y.3) ~ x.3, df3)
+
+new_x3      <- seq(min(x.3), max(x.3), 0.01)
+prediction3 <- exp(predict(exp.mod3, newdata = list(x.3 = new_x3)))
+exp_line3   <- data.frame(x.3 = new_x3, y.3 = prediction3)
+
+# eq <- paste0('paste(y, " = "', round(exp(exp.mod$coefficients[1], 2)), 'italic(e^{',  round(exp.mod$coefficients[2], 2), 
+#              "*x ~~+~~ ", 
+#              '}), ~~~~~~~~R^2~ "="~', round(summary(exp.mod)$r.squared, 2), ")")
+# eq <- expression("y = ", round(exp(exp.mod$coefficients[1]), 2), "e"^{round(exp.mod$coefficients[2], 2)})
+
+
+# eq.3 <- paste0('paste(y, " = ", italic(e{',  round(exp.mod2$coefficients[2], 2),
+#                "*x ~~+~~ ", round(exp.mod2$coefficients[1], 2),
+#                '}), ~~~~~~~~R^2~ "="~', round(summary(exp.mod2)$r.squared, 2), ")")
+
+# eq <- paste0('paste(y, " = ", italic(e^{',  round(exp.mod$coefficients[2], 2),
+#             "*x ~~+~~ ", round(exp.mod$coefficients[1], 2),
+#             '}), ~~~~~~~~R^2~ "="~', round(summary(exp.mod)$r.squared, 2), ")")
+
+ex3_plot <- ggplot(data = df3, mapping = aes(x.3, y.3)) + 
+  geom_point(alpha=0.7, color = "blue") +
+  
+  scale_y_log10() +
+  labs(x = "Time (Hours)", y = "OD600 (Log 10)") +
+  theme(axis.title = element_text(size = 15)) +
+  
+  ggtitle("Exponential Phase AV1 R2A pH 4.0 30C 1:100 subculture") +
+  theme(plot.title = element_text(size = 16)) +
+  theme(plot.title = element_text(hjust = .5)) +
+  
+  theme(panel.background = element_rect(fill = "white", colour = "black")) +
+  theme(aspect.ratio = 1) +
+  
+  theme(
+    panel.grid.major.x = element_line(color = "grey80", linetype = "dashed"),
+    panel.grid.minor.x = element_line(colour = "grey85", linetype = "dashed"),
+  ) +
+  
+  geom_line(data = exp_line3)
+# #geom_text(aes(x = min(x) + 0.1 * diff(range(x)),
+#               y = min(y) + 0.9 * diff(range(y)), label = eq),
+#           parse = TRUE, size = 5, check_overlap = TRUE, hjust = 0)
+
+ex3_plot
+
+summary(exp.mod3)
+
+R_sq.3 <- round(summary(exp.mod3)$r.squared, 2)
+print(R_sq.3)
+
+B.3 <- as.numeric(round(exp.mod3$coefficients[2], 2))
+print(B.3)
+
+dt.3 <- log(2)/B.3
+print(dt.3)
+
+
+
+###############################################################################
+## Condition 5 ################################################################
+
+
+## GROWTH CONDITION: AV1 in R2A pH 4.0 30C 1:200 subculture
+#want to treat each column as an independent growth curve. 
+##Combine replicates onto the same scatter plot 
+ggplot(gc, aes(x = Time)) + 
+  geom_point(aes(y=A4, color="A4")) +
+  geom_point(aes(y=B4, color="B4")) +
+  geom_point(aes(y=C4, color="C4")) +
+  geom_point(aes(y=D4, color="D4")) +
+  geom_point(aes(y=E4, color="E4")) +
+  geom_point(aes(y=F4, color="F4")) +
+  geom_point(aes(y=G4, color="G4")) +
+  geom_point(aes(y=H4, color="H4")) +
+  
+  scale_y_log10() +
+  scale_x_continuous(breaks = seq(0, 28, by = 2)) +
+  labs(x = "Hours", y = "OD600 (Log 10)") +
+  
+  theme(panel.background = element_rect(fill = "white", colour = "black")) +
+  theme(aspect.ratio = 1) +
+  theme(
+    panel.grid.major.x = element_line(color = "grey80", linetype = "dashed"),
+    panel.grid.minor.x = element_line(colour = "grey85", linetype = "dashed"),
+  ) +
+  
+  ggtitle("AV1 R2A pH 4.0 30C 1:200 subculture replicates") +
+  theme(plot.title = element_text(size = 16)) +
+  theme(plot.title = element_text(hjust = .5)) +
+  
+  theme(axis.text = element_text(face = "plain", size = 12)) + 
+  theme(axis.title = element_text(size = 15)) 
+#This allows for a quick visualization of how the growth curves compare
+#May identify potential outliers
+# Determine if their is significant differences between replicates
+
+
+##To get the mean & standard deviation of replicates
+gc_4 <- gc %>%
+  rowwise() %>%
+  mutate(
+    m = mean(c(A4,B4,C4,D4,E4,F4,G4,H4)),
+    sd = sd(c(A4,B4,C4,D4,E4,F4,G4,H4))
+  )
+#Will add an additional column named "m" to your df that takes the average of A1, B1...
+#sd will calculate the standard deviation of the replicates
+
+
+##To plot the average & sd of the 8 replicates
+ggplot(gc_4, aes(x = Time, y = m)) + geom_point(alpha=0.7, color = "blue") +
+  
+  labs(x = "Time (Hours)", y = "OD600 (Log 10)") +
+  theme(axis.title = element_text(size = 15)) +
+  scale_x_continuous(breaks = seq(0, 28, by = 2)) +
+  scale_y_log10() +
+  
+  ggtitle("AV1 R2A pH 4.0 30C 1:200 subculture") +
+  theme(plot.title = element_text(size = 16)) +
+  theme(plot.title = element_text(hjust = .5)) +
+  
+  theme(panel.background = element_rect(fill = "white", colour = "black")) +
+  theme(aspect.ratio = 1) +
+  
+  theme(
+    panel.grid.major.x = element_line(color = "grey80", linetype = "dashed"),
+    panel.grid.minor.x = element_line(colour = "grey85", linetype = "dashed"),
+  ) +
+  
+  theme(axis.text = element_text(face = "plain", size = 12)) + 
+  
+  geom_errorbar(aes(ymin=m-sd, ymax=m+sd), width=.1,
+                position=position_dodge(.9))
+#This graphs the mean & standard deviation of the 8 replicates 
+
+
+
+########## EXPONENTIAL GRAPH ###################
+##Zoom in on exponential phase of growth to get doubling time
+ex4 <- gc_4[c(5:26),c(1,99)]
+#creates a dataset with just time & mean of condition 1
+#c(1:105)...rows 1:105
+#c(1,99)...columns 1&99
+
+
+
+#Plot just the exponential phase of the growth curve
+x.4 <- ex4$Time
+y.4 <- ex4$m
+
+df4 <- data.frame(x.4, y.4)
+
+exp.mod4    <- lm(log(y.4) ~ x.4, df4)
+
+new_x4      <- seq(min(x.4), max(x.4), 0.01)
+prediction4 <- exp(predict(exp.mod4, newdata = list(x.4 = new_x4)))
+exp_line4   <- data.frame(x.4 = new_x4, y.4 = prediction4)
+
+
+ex4_plot <- ggplot(data = df4, mapping = aes(x.4, y.4)) + 
+  geom_point(alpha=0.7, color = "blue") +
+  
+  scale_y_log10() +
+  labs(x = "Time (Hours)", y = "OD600 (Log 10)") +
+  theme(axis.title = element_text(size = 15)) +
+  
+  ggtitle("Exponential Phase AV1 R2A pH 4.0 30C 1:200 subculture") +
+  theme(plot.title = element_text(size = 16)) +
+  theme(plot.title = element_text(hjust = .5)) +
+  
+  theme(panel.background = element_rect(fill = "white", colour = "black")) +
+  theme(aspect.ratio = 1) +
+  
+  theme(
+    panel.grid.major.x = element_line(color = "grey80", linetype = "dashed"),
+    panel.grid.minor.x = element_line(colour = "grey85", linetype = "dashed"),
+  ) +
+  
+  geom_line(data = exp_line4)
+
+ex4_plot
+
+summary(exp.mod4)
+
+R_sq.4 <- round(summary(exp.mod4)$r.squared, 2)
+print(R_sq.4)
+
+B.4 <- as.numeric(round(exp.mod4$coefficients[2], 2))
+print(B.4)
+
+dt.4 <- log(2)/B.4
+print(dt.4)
+
+
+
+
+
+
+##### WRITE DOUBLE TIME TABLE#####
 #table(R_sq, B, dt)
 
 #hydrology > disaster data set 
