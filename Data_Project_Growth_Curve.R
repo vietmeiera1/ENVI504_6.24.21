@@ -126,22 +126,16 @@ ggplot(gc_1, aes(x = Time, y = m)) + geom_point(alpha=0.7, color = "blue") +
 
   theme(
     panel.grid.major.x = element_line(color = "grey80"),
-    panel.grid.minor.x = element_line(colour = "grey85"),
+    panel.grid.minor.x = element_line(colour = "grey85", linetype = "dashed"),
     ) +
   
   geom_errorbar(aes(ymin=m-sd, ymax=m+sd), width=.1,
                 position=position_dodge(.9))
 #This graphs the mean & standard deviation of the 8 replicates 
-#  grids(linetype = "dashed")
 
 
 
-
-
-
-
-
-
+########## EXPONENTIAL GRAPH ###################
 ##Zoom in on exponential phase of growth to get doubling time
 ex1 <- gc_1[c(5:26),c(1,99)]
 #creates a dataset with just time & mean of condition 1
@@ -158,42 +152,6 @@ library(Hmisc)
 install.packages("ggpmisc")
 library(ggpmisc)
 
-
-#Plot just the exponential phase of the growth curve
-ggplot(ex1, aes(x = Time, y = m)) + geom_point(alpha=0.7, color = "blue") +
-  
-  scale_y_log10() +
-  labs(x = "Time (Hours)", y = "OD600 (Log 10)") +
-  theme(axis.title = element_text(size = 15)) +
-  
-  ggtitle("Exponential Phase AV1 R2A pH 4.0 30C 1:25 subculture") +
-  theme(plot.title = element_text(size = 16)) +
-  theme(plot.title = element_text(hjust = .5)) +
-  
-  theme(panel.background = element_rect(fill = "white", colour = "black")) +
-  theme(aspect.ratio = 1) +
-  
-  
-  theme(
-    panel.grid.major.x = element_line(color = "grey80"),
-    panel.grid.minor.x = element_line(colour = "grey85"),
-  ) +
-  
-  stat_smooth(method = 'nls', 
-              method.args = list(start = c(a=1, b=1)), 
-              formula = y~a*exp(b*x), 
-              se = FALSE) +
-  
-  stat_regline_equation(label.x = 1, aes(label = ..rr.label..)) +
-
-  stat_regline_equation(
-      label.x = 1, 
-      label.y = log(.545), 
-      aes(label = ..eq.label..))
-  
- 
-
-
 #Plot just the exponential phase of the growth curve
 x <- ex1$Time
 y <- ex1$m
@@ -206,9 +164,19 @@ new_x      <- seq(min(x), max(x), 0.01)
 prediction <- exp(predict(exp.mod, newdata = list(x = new_x)))
 exp_line   <- data.frame(x = new_x, y = prediction)
 
-eq <- paste0('paste(y, " = ", italic(e^{',  round(exp.mod$coefficients[2], 2), 
+# eq <- paste0('paste(y, " = "', round(exp(exp.mod$coefficients[1], 2)), 'italic(e^{',  round(exp.mod$coefficients[2], 2), 
+#              "*x ~~+~~ ", 
+#              '}), ~~~~~~~~R^2~ "="~', round(summary(exp.mod)$r.squared, 2), ")")
+# eq <- expression("y = ", round(exp(exp.mod$coefficients[1]), 2), "e"^{round(exp.mod$coefficients[2], 2)})
+
+
+eq <- paste0('paste(y, " = ", italic(e{',  round(exp.mod$coefficients[2], 2),
              "*x ~~+~~ ", round(exp.mod$coefficients[1], 2),
              '}), ~~~~~~~~R^2~ "="~', round(summary(exp.mod)$r.squared, 2), ")")
+
+# eq <- paste0('paste(y, " = ", italic(e^{',  round(exp.mod$coefficients[2], 2),
+#             "*x ~~+~~ ", round(exp.mod$coefficients[1], 2),
+#             '}), ~~~~~~~~R^2~ "="~', round(summary(exp.mod)$r.squared, 2), ")")
 
 ex1_plot <- ggplot(data = df, mapping = aes(x, y)) + 
   geom_point(alpha=0.7, color = "blue") +
@@ -230,18 +198,132 @@ ex1_plot <- ggplot(data = df, mapping = aes(x, y)) +
   ) +
   
   geom_line(data = exp_line) +
-  geom_text(aes(x = min(x) + 0.1 * diff(range(x)), 
-                y = min(y) + 0.9 * diff(range(y)), label = eq), 
+  geom_text(aes(x = min(x) + 0.1 * diff(range(x)),
+                y = min(y) + 0.9 * diff(range(y)), label = eq),
             parse = TRUE, size = 5, check_overlap = TRUE, hjust = 0)
 
 ex1_plot
 
-
-  
-
-
+summary(exp.mod)
  
+R_sq <- round(summary(exp.mod)$r.squared, 2)
+print(R_sq)
 
+B <- as.numeric(round(exp.mod$coefficients[2], 2))
+print(B)
+
+dt <- log(2)/B
+print(dt)
+
+
+
+##### WRITE DOUBLE#####
+#table(R_sq, B, dt)
+
+#hydrology > disaster data set 
+library(gt) 
+
+
+
+tab <- matrix(c(7, 5, 14, 19, 3, 2, 17, 6, 12), ncol=3, byrow=TRUE)
+colnames(tab) <- c('colName1','colName2','colName3')
+rownames(tab) <- c('rowName1','rowName2','rowName3')
+tab <- as.table(tab)
+
+
+
+
+
+
+
+
+
+
+
+#              "*x ~~+~~ ", 
+#              '}), ~~~~~~~~R^2~ "="~', round(summary(exp.mod)$r.squared, 2), ")")
+
+
+
+# #Method gives linear line not exponetial line equation
+# #Plot just the exponential phase of the growth curve
+# ggplot(ex1, aes(x = Time, y = m)) + geom_point(alpha=0.7, color = "blue") +
+# 
+#   scale_y_log10() +
+#   labs(x = "Time (Hours)", y = "OD600 (Log 10)") +
+#   theme(axis.title = element_text(size = 15)) +
+# 
+#   ggtitle("Exponential Phase AV1 R2A pH 4.0 30C 1:25 subculture") +
+#   theme(plot.title = element_text(size = 16)) +
+#   theme(plot.title = element_text(hjust = .5)) +
+# 
+#   theme(panel.background = element_rect(fill = "white", colour = "black")) +
+#   theme(aspect.ratio = 1) +
+# 
+# 
+#   theme(
+#     panel.grid.major.x = element_line(color = "grey80"),
+#     panel.grid.minor.x = element_line(colour = "grey85"),
+#   ) +
+# 
+#   stat_smooth(method = 'nls',
+#               method.args = list(start = c(a=1, b=1)),
+#               formula = y~a*exp(b*x),
+#               se = FALSE) +
+# 
+#   stat_regline_equation(label.x = 1, aes(label = ..rr.label..)) +
+# 
+#   stat_regline_equation(
+#     formula = y~a*exp(b*x),
+#     label.x.npc = "left",
+#     label.y.npc = "top",
+#     label.x = NULL,
+#     label.y = NULL,
+#     output.type = "expression",
+#     geom = "text",
+#     position = "identity",
+#     na.rm = FALSE,
+#     show.legend = NA,
+#     inherit.aes = TRUE,
+#   )
+# 
+# 
+# 
+# 
+# 
+# 
+# ggplot(ex1, aes(x = Time, y = m)) + geom_point(alpha=0.7, color = "blue") +
+#   
+#   scale_y_log10() +
+#   labs(x = "Time (Hours)", y = "OD600 (Log 10)") +
+#   theme(axis.title = element_text(size = 15)) +
+#   
+#   ggtitle("Exponential Phase AV1 R2A pH 4.0 30C 1:25 subculture") +
+#   theme(plot.title = element_text(size = 16)) +
+#   theme(plot.title = element_text(hjust = .5)) +
+#   
+#   theme(panel.background = element_rect(fill = "white", colour = "black")) +
+#   theme(aspect.ratio = 1) +
+#   
+#   
+#   theme(
+#     panel.grid.major.x = element_line(color = "grey80"),
+#     panel.grid.minor.x = element_line(colour = "grey85"),
+#   ) +
+#   
+#   stat_smooth(method = 'nls',
+#               method.args = list(start = c(a=1, b=1)),
+#               formula = y~a*exp(b*x),
+#               se = FALSE) +
+#   
+#   stat_regline_equation(label.x = 1, aes(label = ..rr.label..)) +
+#   
+#   stat_regline_equation(
+#       label.x = 1,
+#       label.y = log(.545),
+#       aes(label = ..eq.label..))
+#  
+# 
 
 
 
@@ -305,3 +387,39 @@ model.A1$vals
 predict(model.AV1$model)
 
 growth.values.plate <- SummarizeGrowthByPlate(gc)
+
+
+
+
+# #Method gives linear line not exponetial line equation
+# #Plot just the exponential phase of the growth curve
+# ggplot(ex1, aes(x = Time, y = m)) + geom_point(alpha=0.7, color = "blue") +
+#   
+#   scale_y_log10() +
+#   labs(x = "Time (Hours)", y = "OD600 (Log 10)") +
+#   theme(axis.title = element_text(size = 15)) +
+#   
+#   ggtitle("Exponential Phase AV1 R2A pH 4.0 30C 1:25 subculture") +
+#   theme(plot.title = element_text(size = 16)) +
+#   theme(plot.title = element_text(hjust = .5)) +
+#   
+#   theme(panel.background = element_rect(fill = "white", colour = "black")) +
+#   theme(aspect.ratio = 1) +
+#   
+#   
+#   theme(
+#     panel.grid.major.x = element_line(color = "grey80"),
+#     panel.grid.minor.x = element_line(colour = "grey85"),
+#   ) +
+#   
+#   stat_smooth(method = 'nls', 
+#               method.args = list(start = c(a=1, b=1)), 
+#               formula = y~a*exp(b*x), 
+#               se = FALSE) +
+#   
+#   stat_regline_equation(label.x = 1, aes(label = ..rr.label..)) +
+# 
+#   stat_regline_equation(
+#       label.x = 1, 
+#       label.y = log(.545), 
+#       aes(label = ..eq.label..))
