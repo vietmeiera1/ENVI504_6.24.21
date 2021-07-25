@@ -1,0 +1,158 @@
+---
+title: "Final Homework"
+author: "Anna Vietmeier"
+date: "7/23/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+
+-
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(warning = TRUE)
+```
+## Precipitation Patterns  
+*Albasini Dam, South Africa*  
+
+### Instructions  
+**Due 27 July 2021**  
+This homework is due by class time on Tuesday.  You will upload both the R Markdown document (this file) and the output hypertext markup language (HTML) document (the output knit produces) to your GitHub repository.  Please be sure to update your name in the *author* field in the header information of this document.  Be careful, the warnings are currently set not to appear; you may wish to turn them on (TRUE) until you are confident in your file.  
+
+Your assignment is to produce two graphs based on data from the Albasini Dam weather station in South Africa.  First, a bar graph that shows annual precipitation over the period 1980 to 2020.  Second, an average monthly precipitation graph with the standard deviation shown as error bars on the figure.  For each, you should use ggplot2 to generate nice figures and you should write clear, concise figure captions below each figure in the Rmd document (they should not be a part of your figure).  Lastly, you should use a t-test to draw a conclusion about the period 1980-2000 compared to 2000-2020.  Along with your t-test results, include a boxplot that compares these populations (hint: use a long data frame format).  
+
+This Rmd file will not run correctly.  I have included many pieces of code that you will need to get you started; however, you will need to make considerable additions.  I have not put in any code that is outright wrong, but I may have removed parts that will make the line not run or not run properly.  I have *tried* not to make anything appear misleading - you can tell me if I did a good job.  
+
+Lastly, in your Rmd file, you should remove these instructions and begin the assignment with an introduction the two figures and analysis (one or two sentances).  The figures and captions, and the t-test results and interpretation are the most important components, thus worth the vast majority of the points of the homework.  
+
+```{r include=FALSE}
+library(readr)
+library(dplyr)
+library(tidyr)
+library(lubridate)
+library(ggplot2)
+library(forcats)
+
+# the data are provided via URL, the "filename" will not need adjustment - this may not apply to the options of the command.  If you prefer to work locally, the dataset is in the GitHub repository and the Box folder.  For the purposes of this homework, you may ignore the quality codes (in fact, you need to in order to process all of the data).  
+prcp <- read_csv("https://duq.box.com/shared/static/d1523vk9rnilrtsuuhodffwj6vjygywk.csv", skip = 9)
+prcp <- prcp[1:14610,]
+
+# process dates with lubridate.  For help, see the lubridate cheat sheet in the Box folder.
+
+###need to parse date: Year, Mon, Day
+prcp$dt <- as_date(ymd(prcp$DATE))
+```
+
+Data are analyzed based on hydrologic year, which South Africa runs from July to August.
+
+```{r include=FALSE}
+# Pull year and month from dt
+prcp$year <- year(prcp$dt)
+prcp$mont <- month(prcp$dt)
+
+# Preallocate "hydro.y" for hydrologic year and hydro.m
+prcp$hydro.y <-prcp$mont(8):prcp$mont(7)
+
+prcp$hydro.m <- prcp$mont(August - July)
+# DEFINE: hydrologic year is the year that the hydrologic year ENDS.  Ex: Hydrologic year 2020 begins August 2019 and goes to July 2020.
+
+   
+for (i in 1:nrow(prcp$hydro.m)) {
+      if (prcp$mont[i] >= 8) {
+            # adds one year if the month is August or later.
+            # pulls month back so that August(8) is month 1
+      } else {
+            prcp$hydro.m[i] <- prcp$hydro.m[i] + 5 # pushes month forward so January(1) is month 6
+      }
+}
+```
+
+### Annual Precipitation
+
+```{r echo=FALSE}
+annual <- prcp %>%
+       %>%
+      summarize(total = )
+ggplot(annual, ) +
+      geom_bar(stat = "identity", fill = "steelblue") +
+      labs() +
+      theme(panel.background = element_rect(fill = "white", colour = "black")) +
+      theme(aspect.ratio = 1) +
+      theme(axis.text = element_text(face = "plain", size = 12))
+```
+
+### Typical Monthly Precipitation
+
+```{r echo=FALSE}
+prcp$hydro.ym <- 100 * prcp$hydro.y + prcp$hydro.m
+monthly <- prcp %>%
+      group_by(hydro.ym) %>%
+      summarize(total = )
+mon_pattern <- monthly %>%
+      mutate(year = floor(hydro.ym/100)) %>%
+      mutate(mon = hydro.ym - (100 * floor(hydro.ym/100))) %>%
+      group_by() %>%
+      summarize(prcp = , std = )
+mon_pattern$m <- factor(c("Aug", "Sep", "Oct", "Nov", "Dec", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul")) # this puts the months in this order; otherwise, alphabetical is used.
+ggplot(mon_pattern, aes(x = fct_reorder(m, mon), y = prcp)) + # fct_reorder is a command from forcats library that orders the factor, m (the name of the month)
+      geom_bar() +
+      geom_errorbar() +
+      labs(x = , y = ) +
+      theme(panel.background = element_rect(fill = "white", colour = "black")) +
+      theme(aspect.ratio = 1) +
+      theme(axis.text = element_text(face = "plain", size = 12))
+```
+
+### T-test for the Scores 1980-2000 compared to 2001-2020
+
+```{r echo=FALSE}
+# t.test
+prcp1980 <- prcp %>%
+      filter(hydro.y < ) %>%
+      group_by() %>%
+      summarize(total = )
+prcp2000 <- prcp %>%
+      filter(hydro.y > ) %>%
+      group_by() %>%
+      summarize(total = )
+t <- t.test()
+annual$score <- as.character(annual$hydro.y) # preallocation
+for (i in ) {
+      if () {
+            annual$score[i] <- "1981-2000"
+      } else {
+            annual$score[i] <- "2001-2020"
+      }
+}
+ggplot(annual) +
+      geom_boxplot() +
+      labs(x = "Year", y = "Annual Precipitation (mm)") +
+      theme(panel.background = element_rect(fill = "white", colour = "black")) +
+      theme(aspect.ratio = 1) +
+      theme(axis.text = element_text(face = "plain", size = 12))
+```
+
+The t-test shows p = `t$p.value` > 0.05.  This suggests that these two populations are not statistically different.  The trend shown by the boxplot is consistant with the overall decrease in precipitation in the region.  
