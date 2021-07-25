@@ -74,21 +74,24 @@ prcp$year <- year(prcp$dt)
 prcp$mont <- month(prcp$dt)
 
 # Preallocate "hydro.y" for hydrologic year and hydro.m
-prcp$hydro.y <-prcp$mont(8):prcp$mont(7)
-
-prcp$hydro.m <- prcp$mont(August - July)
+prcp$hydro.y <-prcp$year
+prcp$hydro.m <- prcp$mont
+#  Use fn to add water year to the dataframe
 # DEFINE: hydrologic year is the year that the hydrologic year ENDS.  Ex: Hydrologic year 2020 begins August 2019 and goes to July 2020.
 
    
-for (i in 1:nrow(prcp$hydro.m)) {
+for (i in 1:nrow(prcp)) {
       if (prcp$mont[i] >= 8) {
-            # adds one year if the month is August or later.
-            # pulls month back so that August(8) is month 1
+          
       } else {
-            prcp$hydro.m[i] <- prcp$hydro.m[i] + 5 # pushes month forward so January(1) is month 6
+            prcp$hydro.m[i] <- prcp$hydro.m[i] + 5 
       }
 }
+# adds one year if the month is August or later.
+# pulls month back so that August(8) is month 1
+# pushes month forward so January(1) is month 6
 ```
+
 
 ### Annual Precipitation
 
