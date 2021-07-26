@@ -95,6 +95,7 @@ ggplot(annual, aes(x = hydro.y, y = total)) +
       labs(x= "Year", y = "Precipitation (inches)") +
       theme(panel.background = element_rect(fill = "white", colour = "black")) +
       theme(aspect.ratio = 1) +
+      ggtitle("Annual Precipitation Albansi Dam, South Africa") +
       theme(axis.text = element_text(face = "plain", size = 12))
 ```
 
@@ -108,7 +109,7 @@ monthly <- prcp %>%
       group_by(hydro.ym) %>%
       summarize(total = sum(`DAILY RAIN`, na.rm = TRUE))
 
-print(monthly)
+
 
 mon_pattern <- monthly %>%
       mutate(year = floor(hydro.ym/100)) %>%
@@ -120,9 +121,10 @@ ggplot(mon_pattern, aes(x = fct_reorder(m, mon), y = prcp)) + # fct_reorder is a
       geom_bar(stat = "identity", fill = "steelblue") +
       geom_errorbar(aes(ymin=prcp-std, ymax=prcp+std), width=.1,
                 position=position_dodge(.9)) +
-      labs(x = "Month", y = "Average Monthly Precipitation (in") +
+      labs(x = "Month", y = "Average Monthly Precipitation (inches)") +
       theme(panel.background = element_rect(fill = "white", colour = "black")) +
       theme(aspect.ratio = 1) +
+      ggtitle("Monthly Precipitation Albansi Dam, South Africa") +
       theme(axis.text = element_text(face = "plain", size = 12))
 ```
 
@@ -131,27 +133,31 @@ ggplot(mon_pattern, aes(x = fct_reorder(m, mon), y = prcp)) + # fct_reorder is a
 ```{r echo=FALSE}
 # t.test
 prcp1980 <- prcp %>%
-      filter(hydro.y < ) %>%
-      group_by() %>%
-      summarize(total = )
+      filter(hydro.y < 2001) %>%
+      group_by(hydro.y) %>%
+      summarize(total = sum(hydro.y))
 prcp2000 <- prcp %>%
-      filter(hydro.y > ) %>%
-      group_by() %>%
-      summarize(total = )
-t <- t.test()
+      filter(hydro.y > 2000) %>%
+      group_by(hydro.y) %>%
+      summarize(total = sum(hydro.y))
+t <- t.test(prcp1980$total,prcp2000$total)
 annual$score <- as.character(annual$hydro.y) # preallocation
-for (i in ) {
-      if () {
+for (i in 1:nrow(annual)) {
+      if (annual$score[i] < 2001) {
             annual$score[i] <- "1981-2000"
       } else {
             annual$score[i] <- "2001-2020"
       }
 }
-ggplot(annual) +
+
+
+
+ggplot(annual, aes(x=score, y=total)) +
       geom_boxplot() +
       labs(x = "Year", y = "Annual Precipitation (mm)") +
       theme(panel.background = element_rect(fill = "white", colour = "black")) +
       theme(aspect.ratio = 1) +
+      ggtitle("Annual Precipitation Albansi Dam, South Africa")
       theme(axis.text = element_text(face = "plain", size = 12))
 ```
 
