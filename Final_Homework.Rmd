@@ -11,26 +11,8 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## R Markdown
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
 
 When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
-```
-
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
-
-
--
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(warning = TRUE)
@@ -79,11 +61,16 @@ prcp$hydro.m <- prcp$mont
 #  Use fn to add water year to the dataframe
 # DEFINE: hydrologic year is the year that the hydrologic year ENDS.  Ex: Hydrologic year 2020 begins August 2019 and goes to July 2020.
 
+########
+# monthly data has issue. starts @ 6 and stops at month 12
    
 for (i in 1:nrow(prcp)) {
       if (prcp$mont[i] >= 8) {
-          
-      } else {
+          prcp$hydro.y[i] <- prcp$hydro.y[i] + 1 
+          prcp$hydro.m[i] <- prcp$hydro.m[i] - 7
+      }
+
+       else {
             prcp$hydro.m[i] <- prcp$hydro.m[i] + 5 
       }
 }
@@ -96,13 +83,16 @@ for (i in 1:nrow(prcp)) {
 ### Annual Precipitation
 
 ```{r echo=FALSE}
+
+
+
 annual <- prcp %>%
        group_by(hydro.y)%>%
-      summarize(total = )
+       summarize(total = sum(`DAILY RAIN`, na.rm = TRUE)) 
 
-ggplot(annual, aes(x = hydro.y, y = prcp)) +
+ggplot(annual, aes(x = hydro.y, y = total)) +
       geom_bar(stat = "identity", fill = "steelblue") +
-      labs(x= , y = ) +
+      labs(x= "Year", y = "Precipitation (inches)") +
       theme(panel.background = element_rect(fill = "white", colour = "black")) +
       theme(aspect.ratio = 1) +
       theme(axis.text = element_text(face = "plain", size = 12))
@@ -112,19 +102,25 @@ ggplot(annual, aes(x = hydro.y, y = prcp)) +
 
 ```{r echo=FALSE}
 prcp$hydro.ym <- 100 * prcp$hydro.y + prcp$hydro.m
+
+
 monthly <- prcp %>%
       group_by(hydro.ym) %>%
-      summarize(total = )
+      summarize(total = sum(`DAILY RAIN`, na.rm = TRUE))
+
+print(monthly)
+
 mon_pattern <- monthly %>%
       mutate(year = floor(hydro.ym/100)) %>%
       mutate(mon = hydro.ym - (100 * floor(hydro.ym/100))) %>%
-      group_by() %>%
-      summarize(prcp = , std = )
+      group_by(mon) %>%
+      summarize(prcp = mean(total), std = sd(total))
 mon_pattern$m <- factor(c("Aug", "Sep", "Oct", "Nov", "Dec", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul")) # this puts the months in this order; otherwise, alphabetical is used.
 ggplot(mon_pattern, aes(x = fct_reorder(m, mon), y = prcp)) + # fct_reorder is a command from forcats library that orders the factor, m (the name of the month)
-      geom_bar() +
-      geom_errorbar() +
-      labs(x = , y = ) +
+      geom_bar(stat = "identity", fill = "steelblue") +
+      geom_errorbar(aes(ymin=prcp-std, ymax=prcp+std), width=.1,
+                position=position_dodge(.9)) +
+      labs(x = "Month", y = "Average Monthly Precipitation (in") +
       theme(panel.background = element_rect(fill = "white", colour = "black")) +
       theme(aspect.ratio = 1) +
       theme(axis.text = element_text(face = "plain", size = 12))
