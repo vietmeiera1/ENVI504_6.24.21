@@ -5,30 +5,17 @@ date: "7/23/2021"
 output: html_document
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
-
-## R Markdown
-
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(warning = TRUE)
-```
 ## Precipitation Patterns  
 *Albasini Dam, South Africa*  
 
-### Instructions  
-**Due 27 July 2021**  
-This homework is due by class time on Tuesday.  You will upload both the R Markdown document (this file) and the output hypertext markup language (HTML) document (the output knit produces) to your GitHub repository.  Please be sure to update your name in the *author* field in the header information of this document.  Be careful, the warnings are currently set not to appear; you may wish to turn them on (TRUE) until you are confident in your file.  
+### Introduction 
+**Due 27 July 2021** 
 
-Your assignment is to produce two graphs based on data from the Albasini Dam weather station in South Africa.  First, a bar graph that shows annual precipitation over the period 1980 to 2020.  Second, an average monthly precipitation graph with the standard deviation shown as error bars on the figure.  For each, you should use ggplot2 to generate nice figures and you should write clear, concise figure captions below each figure in the Rmd document (they should not be a part of your figure).  Lastly, you should use a t-test to draw a conclusion about the period 1980-2000 compared to 2000-2020.  Along with your t-test results, include a boxplot that compares these populations (hint: use a long data frame format).  
+Analysis of data collected from the Albasini Dam weather station located in South Africa. Data consists of monthly precipitation measured in inches from 1980 to 2020. The hydrological year in South Africa runs from July to August. Data was converted to the hydrological year prior to beginning data analysis
 
-This Rmd file will not run correctly.  I have included many pieces of code that you will need to get you started; however, you will need to make considerable additions.  I have not put in any code that is outright wrong, but I may have removed parts that will make the line not run or not run properly.  I have *tried* not to make anything appear misleading - you can tell me if I did a good job.  
+The average precipitation for the hydrological year from 1980-2020 is represented in a bar plot (<b>Figure 1</b>). 
+The average monthly precipitation from 1980-2020 and the standard deviation for each month is represented in a bar plot with error bars (<b>Figure 2</b>). Annual precipitation data from 1980-2000 and 2001-2020 were grouped together to compare for significant difference in perciptation using a t-test (<b>Figure 3</b>). 
 
-Lastly, in your Rmd file, you should remove these instructions and begin the assignment with an introduction the two figures and analysis (one or two sentances).  The figures and captions, and the t-test results and interpretation are the most important components, thus worth the vast majority of the points of the homework.  
 
 ```{r include=FALSE}
 library(readr)
@@ -48,7 +35,7 @@ prcp <- prcp[1:14610,]
 prcp$dt <- as_date(ymd(prcp$DATE))
 ```
 
-Data are analyzed based on hydrologic year, which South Africa runs from July to August.
+
 
 ```{r include=FALSE}
 # Pull year and month from dt
@@ -95,9 +82,12 @@ ggplot(annual, aes(x = hydro.y, y = total)) +
       labs(x= "Year", y = "Precipitation (inches)") +
       theme(panel.background = element_rect(fill = "white", colour = "black")) +
       theme(aspect.ratio = 1) +
-      ggtitle("Annual Precipitation Albansi Dam, South Africa") +
+      ggtitle("Annual Precipitation") +
       theme(axis.text = element_text(face = "plain", size = 12))
 ```
+
+
+<b>Figure 1.</b> Albansi Dam, South Africa annual precipitation reported in inches from 1980-2020. The highest amount of precipitation was reported in 2000, and the lowest amount of precipitation was reported in 2005.
 
 ### Typical Monthly Precipitation
 
@@ -124,23 +114,28 @@ ggplot(mon_pattern, aes(x = fct_reorder(m, mon), y = prcp)) + # fct_reorder is a
       labs(x = "Month", y = "Average Monthly Precipitation (inches)") +
       theme(panel.background = element_rect(fill = "white", colour = "black")) +
       theme(aspect.ratio = 1) +
-      ggtitle("Monthly Precipitation Albansi Dam, South Africa") +
+      ggtitle("Monthly Precipitation") +
       theme(axis.text = element_text(face = "plain", size = 12))
 ```
+
+
+<b>Figure 2.</b> Albansi Dam, South Africa monthly average precipitation for the hydrological year from 1980-2020. Error bars depict standard deviation in precipitation for each month. The greatest amount of precipitation occured in Jan, followed by Feb. With the least amount of precipitation occuring in Jun, July, and August. The month of Feb experienced the largest fluxuation in precipitation as indicated by having the largest error bar. 
 
 ### T-test for the Scores 1980-2000 compared to 2001-2020
 
 ```{r echo=FALSE}
 # t.test
+
+
 prcp1980 <- prcp %>%
       filter(hydro.y < 2001) %>%
       group_by(hydro.y) %>%
-      summarize(total = sum(hydro.y))
+      summarize(total = sum(`DAILY RAIN`, na.rm = TRUE))
 prcp2000 <- prcp %>%
       filter(hydro.y > 2000) %>%
       group_by(hydro.y) %>%
-      summarize(total = sum(hydro.y))
-t <- t.test(prcp1980$total,prcp2000$total)
+      summarize(total = sum(`DAILY RAIN`, na.rm = TRUE))
+t <- t.test(prcp1980,prcp2000)
 annual$score <- as.character(annual$hydro.y) # preallocation
 for (i in 1:nrow(annual)) {
       if (annual$score[i] < 2001) {
@@ -153,12 +148,16 @@ for (i in 1:nrow(annual)) {
 
 
 ggplot(annual, aes(x=score, y=total)) +
-      geom_boxplot() +
+      geom_boxplot(outlier.colour = "red", fill='Steel Blue') +
+      stat_summary(fun = "mean", geom = "point", shape = 8, size =2, color = 'Black') +
       labs(x = "Year", y = "Annual Precipitation (mm)") +
       theme(panel.background = element_rect(fill = "white", colour = "black")) +
       theme(aspect.ratio = 1) +
-      ggtitle("Annual Precipitation Albansi Dam, South Africa")
+      ggtitle("Annual Precipitation 1981-2000 vs. 2001-2020") +
       theme(axis.text = element_text(face = "plain", size = 12))
 ```
 
-The t-test shows p = `t$p.value` > 0.05.  This suggests that these two populations are not statistically different.  The trend shown by the boxplot is consistant with the overall decrease in precipitation in the region.  
+
+<b>Figure 3.</b> Albansi Dam, South Africa comparison of annual precipitation from 1980-2000 to 2001-2020. Data has been grouped by the hydrological year for South Africa that starts in July. The mean of the data set is indicated by the astricks(*). Outliers in the dataset are indicated as a red dot. The t-test gave value p = 0.749, which is greater than 0.05, therefore this suggests the two populations are not statisticaly different. Although not statistically significant, the trend shown by the boxplot is consistant with the overall decrease in precipitation in the region.  
+
+
