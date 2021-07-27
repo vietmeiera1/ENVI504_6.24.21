@@ -4,6 +4,7 @@ author: "Anna Vietmeier"
 date: "7/26/2021"
 output: html_document
 ---
+---
 
 ## Introduction
 Abandoned mine drainage (AMD) is the result of abandoned mining operations. AMD is high in sulfuric acid, heavy metals, and metalloids. Treatment of AMD can be carried out via passive remediation systems. Passive remediation systems consist of large settling ponds that promote the biogeochemical precipitation of AMD contaminants. Since these systems are open to the environment, they are naturally colonized by microbial populations. Microbes within these populations metabolically impact the remediation process, both positively and negatively. 
@@ -677,6 +678,26 @@ print(a.all)
 
 
 
+
+```
+
+## Doubling Time for All Conditions 
+```{r echo=FALSE}
+
+```
+
+## Discussion
+## Eight replicates in one plot
+```{r echo=FALSE}
+a.all <-ggarrange(a1,a2,a3, ncol = 1) 
+print(a.all)
+
+
+all.ex <-ggarrange(ex1_plot, ex2_plot, ncol = 1) 
+print(all.ex)
+
+graph1 <- ggarrange(a1, ex1_plot, gc_1)
+print(graph1)
 
 ```
 
