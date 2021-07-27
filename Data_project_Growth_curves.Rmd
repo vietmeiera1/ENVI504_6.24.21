@@ -16,6 +16,7 @@ Isolate AV1 was grown in the shaker at 30C with either R2A pH 4.0 or M63 media. 
 
 
 ```{r include = FALSE}
+
 library(readr) 
 library(dplyr)
 library(ggplot2)
@@ -28,6 +29,8 @@ library(broom)
 library(lattice)
 library(Hmisc)
 library(ggpmisc)
+library(ggpubr)
+
 
 setwd("~/Documents/Duquesne/Year_2_F20_S21_U21/Summer 2021/ENVI 404:504 Computer Tools for Scientists Excel & R/RStudio/ENVI504_6.24.21")
 
@@ -40,7 +43,7 @@ gc <- read_csv("AV_85.columns.csv", locale = locale(encoding = "Latin1"), skip =
 #### Condition 1 Individual Replicates
 ```{r echo=FALSE}
 
-ggplot(gc, aes(x = Time)) + 
+a1 <- ggplot(gc, aes(x = Time)) + 
   geom_point(aes(y=(A1-A8), color="A1")) +
   geom_point(aes(y=(B1-B8), color="B1")) +
   geom_point(aes(y=(C1-C8), color="C1")) +
@@ -62,6 +65,7 @@ ggplot(gc, aes(x = Time)) +
   theme(plot.title = element_text(hjust = .5)) +
   theme(axis.text = element_text(face = "plain", size = 12)) + 
   theme(axis.title = element_text(size = 15)) 
+print(a1)
 ```
 ### Condition 1 Average & Standard Deviation of Replicates
 ```{r echo=FALSE}
@@ -137,7 +141,7 @@ dt <- log(2)/B
 
 ###Condition 2 Individual Replicates
 ```{r echo=FALSE}
-ggplot(gc, aes(x = Time)) + 
+a2 <- ggplot(gc, aes(x = Time)) + 
   geom_point(aes(y=(A2-A8), color="A2")) +
   geom_point(aes(y=(B2-A8), color="B2")) +
   geom_point(aes(y=(C2-C8), color="C2")) +
@@ -160,6 +164,7 @@ ggplot(gc, aes(x = Time)) +
   theme(plot.title = element_text(hjust = .5)) +
   theme(axis.text = element_text(face = "plain", size = 12)) + 
   theme(axis.title = element_text(size = 15)) 
+print(a2)
 ```
 ### Condition 2 Average & Standard Deviation of Replicates
 ```{r echo=FALSE}
@@ -229,7 +234,7 @@ dt.2 <- log(2)/B.2
 ## Growth Condition 3
 ###Condition 3 Individual Replicates
 ```{r echo=FALSE}
-ggplot(gc, aes(x = Time)) + 
+a3 <- ggplot(gc, aes(x = Time)) + 
   geom_point(aes(y=A3-A8, color="A3")) +
   geom_point(aes(y=B3-B8, color="B3")) +
   geom_point(aes(y=C3-C8, color="C3")) +
@@ -252,6 +257,7 @@ ggplot(gc, aes(x = Time)) +
   theme(plot.title = element_text(hjust = .5)) +
   theme(axis.text = element_text(face = "plain", size = 12)) + 
   theme(axis.title = element_text(size = 15)) 
+print(a3)
 ```
 ### Condition 3 Average & Standard Deviation of Replicates
 ```{r echo=FALSE}
@@ -315,61 +321,368 @@ dt.3 <- log(2)/B.3
 ## Growth Condition 4
 ###Condition 4 Individual Replicates
 ```{r echo=FALSE}
-
+a4 <- ggplot(gc, aes(x = Time)) + 
+  geom_point(aes(y=A4-A8, color="A4")) +
+  geom_point(aes(y=B4-B8, color="B4")) +
+  geom_point(aes(y=C4-C8, color="C4")) +
+  geom_point(aes(y=D4-D8, color="D4")) +
+  geom_point(aes(y=E4-E8, color="E4")) +
+  geom_point(aes(y=F4-F8, color="F4")) +
+  geom_point(aes(y=G4-G8, color="G4")) +
+  geom_point(aes(y=H4-H8, color="H4")) +
+  ggtitle("AV1 R2A pH 4.0 30C 1:200 subculture replicates") +
+  scale_y_log10() +
+  scale_x_continuous(breaks = seq(0, 28, by = 2)) +
+  labs(x = "Hours", y = "OD600 (Log 10)") +
+  theme(panel.background = element_rect(fill = "white", colour = "black")) +
+  theme(aspect.ratio = 1) +
+  theme(
+    panel.grid.major.x = element_line(color = "grey80", linetype = "dashed"),
+    panel.grid.minor.x = element_line(colour = "grey85", linetype = "dashed"),
+  ) +
+  theme(plot.title = element_text(size = 16)) +
+  theme(plot.title = element_text(hjust = .5)) +
+  theme(axis.text = element_text(face = "plain", size = 12)) + 
+  theme(axis.title = element_text(size = 15)) 
+print(a4)
 ```
 ### Condition 4 Average & Standard Deviation of Replicates
 ```{r echo=FALSE}
+gc_4.R2A <- gc %>%
+  rowwise() %>%
+  mutate(
+    m4.R2A = (mean(c(A4,B4,C4,D4,E4,F4,G4,H4)) - - mean(c(A8,B8,C8,D8,E8,F8,G8,H8))),
+    sd = sd(c(A4,B4,C4,D4,E4,F4,G4,H4))
+  )
 
+ggplot(gc_4.R2A, aes(x = Time, y = m4.R2A)) + geom_point(alpha=0.7, color = "blue") +
+  labs(x = "Time (Hours)", y = "OD600 (Log 10)") +
+  theme(axis.title = element_text(size = 15)) +
+  scale_x_continuous(breaks = seq(0, 28, by = 2)) +
+  scale_y_log10() +
+  ggtitle("AV1 R2A pH 4.0 30C 1:200 subculture") +
+  theme(plot.title = element_text(size = 16)) +
+  theme(plot.title = element_text(hjust = .5)) +
+  theme(panel.background = element_rect(fill = "white", colour = "black")) +
+  theme(aspect.ratio = 1) +
+  theme(
+    panel.grid.major.x = element_line(color = "grey80", linetype = "dashed"),
+    panel.grid.minor.x = element_line(colour = "grey85", linetype = "dashed"),
+  ) +
+  theme(axis.text = element_text(face = "plain", size = 12)) + 
+  geom_errorbar(aes(ymin=m4.R2A-sd, ymax=m4.R2A+sd), width=.1,
+                position=position_dodge(.9))
 ```
 ### Condition 4 Exponential Growth
 ```{r echo=FALSE}
-
+ex4 <- gc_4.R2A[c(12:36),c(1,99)]
+x.4 <- ex4$Time
+y.4 <- ex4$m4.R2A
+df4 <- data.frame(x.4, y.4)
+exp.mod4    <- lm(log(y.4) ~ x.4, df4)
+new_x4      <- seq(min(x.4), max(x.4), 0.01)
+prediction4 <- exp(predict(exp.mod4, newdata = list(x.4 = new_x4)))
+exp_line4   <- data.frame(x.4 = new_x4, y.4 = prediction4)
+ex4_plot <- ggplot(data = df4, mapping = aes(x.4, y.4)) + 
+  geom_point(alpha=0.7, color = "blue") +
+  scale_y_log10() +
+  labs(x = "Time (Hours)", y = "OD600 (Log 10)") +
+  theme(axis.title = element_text(size = 15)) +
+  ggtitle("Exponential Phase AV1 R2A pH 4.0 30C 1:200 subculture") +
+  theme(plot.title = element_text(size = 16)) +
+  theme(plot.title = element_text(hjust = .5)) +
+  theme(panel.background = element_rect(fill = "white", colour = "black")) +
+  theme(aspect.ratio = 1) +
+  theme(
+    panel.grid.major.x = element_line(color = "grey80", linetype = "dashed"),
+    panel.grid.minor.x = element_line(colour = "grey85", linetype = "dashed"),
+  ) +
+  geom_line(data = exp_line4)
+ex4_plot
+R_sq.4 <- round(summary(exp.mod4)$r.squared, 2)
+B.4 <- as.numeric(round(exp.mod4$coefficients[2], 2))
+dt.4 <- log(2)/B.4
 ```
 
 
 ## Growth Condition 5
 ###Condition 5 Individual Replicates
 ```{r echo=FALSE}
-
+a5 <- ggplot(gc, aes(x = Time)) + 
+  geom_point(aes(y=A5-A8, color="A5")) +
+  geom_point(aes(y=B5-B8, color="B5")) +
+  geom_point(aes(y=C5-C8, color="C5")) +
+  geom_point(aes(y=D5-D8, color="D5")) +
+  geom_point(aes(y=E5-E8, color="E5")) +
+  geom_point(aes(y=F5-F8, color="F5")) +
+  geom_point(aes(y=G5-G8, color="G5")) +
+  geom_point(aes(y=H5-H8, color="H5")) +
+  ggtitle("AV1 R2A pH 4.0 30C 1:400 subculture replicates") +
+  scale_y_log10() +
+  scale_x_continuous(breaks = seq(0, 28, by = 2)) +
+  labs(x = "Hours", y = "OD600 (Log 10)") +
+  theme(panel.background = element_rect(fill = "white", colour = "black")) +
+  theme(aspect.ratio = 1) +
+  theme(
+    panel.grid.major.x = element_line(color = "grey80", linetype = "dashed"),
+    panel.grid.minor.x = element_line(colour = "grey85", linetype = "dashed"),
+  ) +
+  theme(plot.title = element_text(size = 16)) +
+  theme(plot.title = element_text(hjust = .5)) +
+  theme(axis.text = element_text(face = "plain", size = 12)) + 
+  theme(axis.title = element_text(size = 15)) 
+print(a5)
 ```
 ### Condition 5 Average & Standard Deviation of Replicates
 ```{r echo=FALSE}
-
+gc_5.R2A <- gc %>%
+  rowwise() %>%
+  mutate(
+    m5 = (mean(c(A5,B5,C5,D5,E5,F5,G5,H5)) - mean(c(A8,B8,C8,D8,E8,F8,G8,H8))),
+    sd = sd(c(A5,B5,C5,D5,E5,F5,G5,H5))
+  )
+ggplot(gc_5.R2A, aes(x = Time, y = m5)) + geom_point(alpha=0.7, color = "blue") +
+  labs(x = "Time (Hours)", y = "OD600 (Log 10)") +
+  theme(axis.title = element_text(size = 15)) +
+  scale_x_continuous(breaks = seq(0, 28, by = 2)) +
+  scale_y_log10() +
+  ggtitle("AV1 R2A pH 4.0 30C 1:400 subculture") +
+  theme(plot.title = element_text(size = 16)) +
+  theme(plot.title = element_text(hjust = .5)) +
+  theme(panel.background = element_rect(fill = "white", colour = "black")) +
+  theme(aspect.ratio = 1) +
+  theme(
+    panel.grid.major.x = element_line(color = "grey80", linetype = "dashed"),
+    panel.grid.minor.x = element_line(colour = "grey85", linetype = "dashed"),
+  ) +
+  theme(axis.text = element_text(face = "plain", size = 12)) + 
+  geom_errorbar(aes(ymin=m5-sd, ymax=m5+sd), width=.1,
+                position=position_dodge(.9))
 ```
 ### Condition 5 Exponential Growth
 ```{r echo=FALSE}
+ex5 <- gc_5.R2A[c(5:26),c(1,99)]
+x.5 <- ex5$Time
+y.5 <- ex5$m5
 
+df5 <- data.frame(x.5, y.5)
+
+exp.mod5    <- lm(log(y.5) ~ x.5, df5)
+
+new_x5      <- seq(min(x.5), max(x.5), 0.01)
+prediction5 <- exp(predict(exp.mod5, newdata = list(x.5 = new_x5)))
+exp_line5   <- data.frame(x.5 = new_x5, y.5 = prediction5)
+
+ex5_plot <- ggplot(data = df5, mapping = aes(x.5, y.5)) + 
+  geom_point(alpha=0.7, color = "blue") +
+  scale_y_log10() +
+  labs(x = "Time (Hours)", y = "OD600 (Log 10)") +
+  theme(axis.title = element_text(size = 15)) +
+  ggtitle("Exponential Phase AV1 R2A pH 4.0 30C 1:400 subculture") +
+  theme(plot.title = element_text(size = 16)) +
+  theme(plot.title = element_text(hjust = .5)) +
+  theme(panel.background = element_rect(fill = "white", colour = "black")) +
+  theme(aspect.ratio = 1) +
+  theme(
+    panel.grid.major.x = element_line(color = "grey80", linetype = "dashed"),
+    panel.grid.minor.x = element_line(colour = "grey85", linetype = "dashed"),
+  ) +
+  geom_line(data = exp_line5)
+ex5_plot
+R_sq.5 <- round(summary(exp.mod5)$r.squared, 2)
+B.5 <- as.numeric(round(exp.mod5$coefficients[2], 2))
+dt.5 <- log(2)/B.5
 ```
 
 ## Growth Condition 6
 ###Condition 6 Individual Replicates
 ```{r echo=FALSE}
-
+a6 <- ggplot(gc, aes(x = Time)) + 
+  geom_point(aes(y=A6-A9, color="A6")) +
+  geom_point(aes(y=B6-B9, color="B6")) +
+  geom_point(aes(y=C6-C9, color="C6")) +
+  geom_point(aes(y=D6-D9, color="D6")) +
+  geom_point(aes(y=E6-E9, color="E6")) +
+  geom_point(aes(y=F6-F9, color="F6")) +
+  geom_point(aes(y=G6-G9, color="G6")) +
+  geom_point(aes(y=H6-H9, color="H6")) +
+  ggtitle("AV1 in M63+L 30C 1:10 subculture replicates") +
+  scale_y_log10() +
+  scale_x_continuous(breaks = seq(0, 28, by = 2)) +
+  labs(x = "Hours", y = "OD600 (Log 10)") +
+  theme(panel.background = element_rect(fill = "white", colour = "black")) +
+  theme(aspect.ratio = 1) +
+  theme(
+    panel.grid.major.x = element_line(color = "grey80", linetype = "dashed"),
+    panel.grid.minor.x = element_line(colour = "grey85", linetype = "dashed"),
+  ) +
+  theme(plot.title = element_text(size = 16)) +
+  theme(plot.title = element_text(hjust = .5)) +
+  theme(axis.text = element_text(face = "plain", size = 12)) + 
+  theme(axis.title = element_text(size = 15)) 
+print(a6)
 ```
 ### Condition 6 Average & Standard Deviation of Replicates
 ```{r echo=FALSE}
-
+gc_6.M <- gc %>%
+  rowwise() %>%
+  mutate(
+    m6 = (mean(c(A6,B6,C6,D6,E6,F6,G6,H6)) - mean(c(A9,B9,C9,D9,E9,F9,G9,H9))),
+    sd = sd(c(A6,B6,C6,D6,E6,F6,G6,H6))
+  )
+ggplot(gc_6.M, aes(x = Time, y = m6)) + geom_point(alpha=0.7, color = "blue") +
+  labs(x = "Time (Hours)", y = "OD600 (Log 10)") +
+  theme(axis.title = element_text(size = 15)) +
+  scale_x_continuous(breaks = seq(0, 28, by = 2)) +
+  scale_y_log10() +
+  ggtitle("AV1 in M63+L 30C 1:10 subculture") +
+  theme(plot.title = element_text(size = 16)) +
+  theme(plot.title = element_text(hjust = .5)) +
+  theme(panel.background = element_rect(fill = "white", colour = "black")) +
+  theme(aspect.ratio = 1) +
+  theme(
+    panel.grid.major.x = element_line(color = "grey80", linetype = "dashed"),
+    panel.grid.minor.x = element_line(colour = "grey85", linetype = "dashed"),
+  ) +
+  theme(axis.text = element_text(face = "plain", size = 12)) + 
+  geom_errorbar(aes(ymin=m6-sd, ymax=m6+sd), width=.1,
+                position=position_dodge(.9))
 ```
 ### Condition 6 Exponential Growth
 ```{r echo=FALSE}
+ex6 <- gc_6.M[c(6:36),c(1,99)]
+x.6 <- ex6$Time
+y.6 <- ex6$m6
+
+df6 <- data.frame(x.6, y.6)
+
+exp.mod6    <- lm(log(y.6) ~ x.6, df6)
+
+new_x6      <- seq(min(x.6), max(x.6), 0.01)
+prediction6 <- exp(predict(exp.mod6, newdata = list(x.6 = new_x6)))
+exp_line6   <- data.frame(x.6 = new_x6, y.6 = prediction6)
+
+ex6_plot <- ggplot(data = df6, mapping = aes(x.6, y.6)) + 
+  geom_point(alpha=0.7, color = "blue") +
+  scale_y_log10() +
+  labs(x = "Time (Hours)", y = "OD600 (Log 10)") +
+  theme(axis.title = element_text(size = 15)) +
+  ggtitle("Exponential Phase AV1 in M63+L 30C 1:10 subculture") +
+  theme(plot.title = element_text(size = 16)) +
+  theme(plot.title = element_text(hjust = .5)) +
+  theme(panel.background = element_rect(fill = "white", colour = "black")) +
+  theme(aspect.ratio = 1) +
+  theme(
+    panel.grid.major.x = element_line(color = "grey80", linetype = "dashed"),
+    panel.grid.minor.x = element_line(colour = "grey85", linetype = "dashed"),
+  ) +
+  geom_line(data = exp_line6)
+ex6_plot
+R_sq.6 <- round(summary(exp.mod6)$r.squared, 2)
+B.6 <- as.numeric(round(exp.mod6$coefficients[2], 2))
+dt.6 <- log(2)/B.6
 
 ```
 
 ## Growth Condition 7
 ###Condition 7 Individual Replicates
 ```{r echo=FALSE}
-
+a7 <- ggplot(gc, aes(x = Time)) + 
+  geom_point(aes(y=A7-A10, color="A7")) +
+  geom_point(aes(y=B7-B10, color="B7")) +
+  geom_point(aes(y=C7-C10, color="C7")) +
+  geom_point(aes(y=D7-D10, color="D7")) +
+  geom_point(aes(y=E7-E10, color="E7")) +
+  geom_point(aes(y=F7-F10, color="F7")) +
+  geom_point(aes(y=G7-G10, color="G7")) +
+  geom_point(aes(y=H7-H10, color="H7")) +
+  ggtitle("AV1 in M63+A 30C 1:10 subculture replicates") +
+  scale_y_log10() +
+  scale_x_continuous(breaks = seq(0, 28, by = 2)) +
+  labs(x = "Hours", y = "OD600 (Log 10)") +
+  theme(panel.background = element_rect(fill = "white", colour = "black")) +
+  theme(aspect.ratio = 1) +
+  theme(
+    panel.grid.major.x = element_line(color = "grey80", linetype = "dashed"),
+    panel.grid.minor.x = element_line(colour = "grey85", linetype = "dashed"),
+  ) +
+  theme(plot.title = element_text(size = 16)) +
+  theme(plot.title = element_text(hjust = .5)) +
+  theme(axis.text = element_text(face = "plain", size = 12)) + 
+  theme(axis.title = element_text(size = 15)) 
+print(a7)
 ```
 ### Condition 7 Average & Standard Deviation of Replicates
 ```{r echo=FALSE}
-
+gc_7M <- gc %>%
+  rowwise() %>%
+  mutate(
+    m7 = (mean(c(A7,B7,C7,D7,E7,F7,G7,H7)) - mean(c(A10,B10,C10,D10,E10,F10,G10,H10))),
+    sd = sd(c(A7,B7,C7,D7,E7,F7,G7,H7))
+  )
+ggplot(gc_7M, aes(x = Time, y = m7)) + geom_point(alpha=0.7, color = "blue") +
+  labs(x = "Time (Hours)", y = "OD600 (Log 10)") +
+  theme(axis.title = element_text(size = 15)) +
+  scale_x_continuous(breaks = seq(0, 28, by = 2)) +
+  scale_y_log10() +
+  ggtitle("AV1 in M63+A 30C 1:10 subculture") +
+  theme(plot.title = element_text(size = 16)) +
+  theme(plot.title = element_text(hjust = .5)) +
+  theme(panel.background = element_rect(fill = "white", colour = "black")) +
+  theme(aspect.ratio = 1) +
+  theme(
+    panel.grid.major.x = element_line(color = "grey80", linetype = "dashed"),
+    panel.grid.minor.x = element_line(colour = "grey85", linetype = "dashed"),
+  ) +
+  theme(axis.text = element_text(face = "plain", size = 12)) + 
+  geom_errorbar(aes(ymin=m7-sd, ymax=m7+sd), width=.1,
+                position=position_dodge(.9))
 ```
 ### Condition 7 Exponential Growth
 ```{r echo=FALSE}
+ex7 <- gc_7M[c(5:50),c(1,99)]
+x.7 <- ex7$Time
+y.7 <- ex7$m7
+df7 <- data.frame(x.7, y.7)
+exp.mod7    <- lm(log(y.7) ~ x.7, df7)
+new_x7      <- seq(min(x.7), max(x.7), 0.01)
+prediction7 <- exp(predict(exp.mod7, newdata = list(x.7 = new_x7)))
+exp_line7   <- data.frame(x.7 = new_x7, y.7 = prediction7)
+
+ex7_plot <- ggplot(data = df7, mapping = aes(x.7, y.7)) + 
+  geom_point(alpha=0.7, color = "blue") +
+  scale_y_log10() +
+  labs(x = "Time (Hours)", y = "OD600 (Log 10)") +
+  theme(axis.title = element_text(size = 15)) +
+  ggtitle("Exponential Phase AV1 in M63+A 30C 1:10 subculture") +
+  theme(plot.title = element_text(size = 16)) +
+  theme(plot.title = element_text(hjust = .5)) +
+  theme(panel.background = element_rect(fill = "white", colour = "black")) +
+  theme(aspect.ratio = 1) +
+  theme(
+    panel.grid.major.x = element_line(color = "grey80", linetype = "dashed"),
+    panel.grid.minor.x = element_line(colour = "grey85", linetype = "dashed"),
+  ) +
+  geom_line(data = exp_line7)
+ex7_plot
+R_sq.7 <- round(summary(exp.mod7)$r.squared, 2)
+B.7 <- as.numeric(round(exp.mod7$coefficients[2], 2))
+dt.7 <- log(2)/B.7
+```
+
+## Eight replicates in one plot
+```{r echo=FALSE}
+a.all <-ggarrange(a1,a2,a3, ncol = 1) 
+print(a.all)
+
+
+
 
 ```
 
 ## Doubling Time for All Conditions 
+```{r echo=FALSE}
 
+```
 
 ## Discussion

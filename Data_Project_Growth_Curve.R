@@ -586,16 +586,11 @@ ex4 <- gc_4.R2A[c(12:36),c(1,99)]
 #Plot just the exponential phase of the growth curve
 x.4 <- ex4$Time
 y.4 <- ex4$m4.R2A
-
 df4 <- data.frame(x.4, y.4)
-
 exp.mod4    <- lm(log(y.4) ~ x.4, df4)
-
 new_x4      <- seq(min(x.4), max(x.4), 0.01)
 prediction4 <- exp(predict(exp.mod4, newdata = list(x.4 = new_x4)))
 exp_line4   <- data.frame(x.4 = new_x4, y.4 = prediction4)
-
-
 ex4_plot <- ggplot(data = df4, mapping = aes(x.4, y.4)) + 
   geom_point(alpha=0.7, color = "blue") +
   scale_y_log10() +
@@ -611,9 +606,7 @@ ex4_plot <- ggplot(data = df4, mapping = aes(x.4, y.4)) +
     panel.grid.minor.x = element_line(colour = "grey85", linetype = "dashed"),
   ) +
   geom_line(data = exp_line4)
-
 ex4_plot
-
 summary(exp.mod4)
 
 R_sq.4 <- round(summary(exp.mod4)$r.squared, 2)
