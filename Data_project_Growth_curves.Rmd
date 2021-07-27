@@ -1,0 +1,375 @@
+---
+title: "ENVI 504 Data Project: Bacterial Growth Curves"
+author: "Anna Vietmeier"
+date: "7/26/2021"
+output: html_document
+---
+
+## Introduction
+Abandoned mine drainage (AMD) is the result of abandoned mining operations. AMD is high in sulfuric acid, heavy metals, and metalloids. Treatment of AMD can be carried out via passive remediation systems. Passive remediation systems consist of large settling ponds that promote the biogeochemical precipitation of AMD contaminants. Since these systems are open to the environment, they are naturally colonized by microbial populations. Microbes within these populations metabolically impact the remediation process, both positively and negatively. 
+Isolate AV1 from the Boyce park passive remediation system pond 1 has been identified to positively impact iron remediation and negatively impact manganese remediation. Characterization of this microbial isolate is important to understand more about this novel isolate and understand how it can impact AMD remediation. Characterization of isolate AV1 includes understanding how the isolate grows under different conditions. This is facilitated via growing AV1 in rich media such as R2A as well as minimal media M63. 
+
+## Methods
+Isolate AV1 was grown in the shaker at 30C with either R2A pH 4.0 or M63 media. M63 minimal media was supplemented with an additional carbon source, either lactate or acetate. All conditions were grown at 30C. Different subculture ratios were used for the rich media to mirror those that had been manually obtained in the lab. Data for this experiment was collected using a 96-well plate and plate reader. Controls for the experiments included sterile R2A pH 4.0 and M63 supplemented with either lactate or acetate to be used as a blank and remove background noise. 
+
+## Results
+
+
+```{r include = FALSE}
+library(readr) 
+library(dplyr)
+library(ggplot2)
+library(growthcurver)
+library(purrr)
+library(matrixStats)
+library(reshape2)
+library(ggpubr)
+library(broom) 
+library(lattice)
+library(Hmisc)
+library(ggpmisc)
+
+setwd("~/Documents/Duquesne/Year_2_F20_S21_U21/Summer 2021/ENVI 404:504 Computer Tools for Scientists Excel & R/RStudio/ENVI504_6.24.21")
+
+gc <- read_csv("AV_85.columns.csv", locale = locale(encoding = "Latin1"), skip = 17, col_names = TRUE) #load in datafile. Skip 1st 17 rows. Column names listed
+```
+
+
+### Growth Condition 1: AV1 R2A pH 4.0 30C 1:25 subculture 
+<br>
+#### Condition 1 Individual Replicates
+```{r echo=FALSE}
+
+ggplot(gc, aes(x = Time)) + 
+  geom_point(aes(y=(A1-A8), color="A1")) +
+  geom_point(aes(y=(B1-B8), color="B1")) +
+  geom_point(aes(y=(C1-C8), color="C1")) +
+  geom_point(aes(y=(D1-D8), color="D1")) +
+  geom_point(aes(y=(E1-E8), color="E1")) +
+  geom_point(aes(y=(F1-F8), color="F1")) +
+  geom_point(aes(y=(G1-G8), color="G1")) +
+  geom_point(aes(y=(H1-H8), color="H1")) +
+  scale_y_log10() +
+  scale_x_continuous(breaks = seq(0, 28, by = 2)) +
+  labs(x = "Hours", y = "OD600 (Log 10)") +
+  theme(panel.background = element_rect(fill = "white", colour = "black")) +
+  theme(aspect.ratio = 1) +
+  theme(
+    panel.grid.major.x = element_line(color = "grey80", linetype = "dashed"),
+    panel.grid.minor.x = element_line(colour = "grey85", linetype = "dashed"),  ) +
+  ggtitle("AV1 R2A pH 4.0 30C 1:25 subculture replicates") +
+  theme(plot.title = element_text(size = 16)) +
+  theme(plot.title = element_text(hjust = .5)) +
+  theme(axis.text = element_text(face = "plain", size = 12)) + 
+  theme(axis.title = element_text(size = 15)) 
+```
+### Condition 1 Average & Standard Deviation of Replicates
+```{r echo=FALSE}
+gc_1 <- gc %>%
+  rowwise() %>%
+  mutate(
+    m.R2A = (mean(c(A1,B1,C1,D1,E1,F1,G1,H1)) - mean(c(A8,B8,C8,D8,E8,F8,G8,H8))),
+    sd = sd(c(A1,B1,C1,D1,E1,F1,G1,H1))
+    )
+
+
+ggplot(gc_1, aes(x = Time, y = m.R2A)) + geom_point(alpha=0.7, color = "blue") +
+  labs(x = "Time (Hours)", y = "OD600 (Log 10)") +
+  theme(axis.title = element_text(size = 15)) +
+  scale_x_continuous(breaks = seq(0, 28, by = 2)) +
+  scale_y_log10() +
+  ggtitle("AV1 R2A pH 4.0 30C 1:25 subculture") +
+  theme(plot.title = element_text(size = 16)) +
+  theme(plot.title = element_text(hjust = .5)) +
+  theme(panel.background = element_rect(fill = "white", colour = "black")) +
+  theme(aspect.ratio = 1) +
+  theme(
+    panel.grid.major.x = element_line(color = "grey80", linetype = "dashed"),
+    panel.grid.minor.x = element_line(colour = "grey85", linetype = "dashed"),
+    ) +
+  theme(axis.text = element_text(face = "plain", size = 12)) + 
+  geom_errorbar(aes(ymin=m.R2A-sd, ymax=m.R2A+sd), width=.1,
+                position=position_dodge(.9))
+```
+### Condition 1 Exponential Growth
+```{r echo=FALSE}
+ex1 <- gc_1[c(5:26),c(1,99)]
+
+x <- ex1$Time
+y <- ex1$m.R2A
+
+df <- data.frame(x, y)
+
+exp.mod    <- lm(log(y) ~ x, df)
+
+new_x      <- seq(min(x), max(x), 0.01)
+prediction <- exp(predict(exp.mod, newdata = list(x = new_x)))
+exp_line   <- data.frame(x = new_x, y = prediction)
+
+ex1_plot <- ggplot(data = df, mapping = aes(x, y)) + 
+  geom_point(alpha=0.7, color = "blue") +
+  scale_y_log10() +
+  labs(x = "Time (Hours)", y = "OD600 (Log 10)") +
+  theme(axis.title = element_text(size = 15)) +
+  ggtitle("Exponential Phase AV1 R2A pH 4.0 30C 1:25 subculture") +
+  theme(plot.title = element_text(size = 16)) +
+  theme(plot.title = element_text(hjust = .5)) +
+  theme(panel.background = element_rect(fill = "white", colour = "black")) +
+  theme(aspect.ratio = 1) +
+  theme(
+    panel.grid.major.x = element_line(color = "grey80", linetype = "dashed"),
+    panel.grid.minor.x = element_line(colour = "grey85", linetype = "dashed"),
+  ) +
+  
+  geom_line(data = exp_line)
+
+ex1_plot
+
+R_sq <- round(summary(exp.mod)$r.squared, 2)
+B <- as.numeric(round(exp.mod$coefficients[2], 2))
+dt <- log(2)/B
+
+
+```
+
+############################################### 
+## Growth Condition 2 AV1 in R2A pH 4.0 30C 1:50 subculture
+
+###Condition 2 Individual Replicates
+```{r echo=FALSE}
+ggplot(gc, aes(x = Time)) + 
+  geom_point(aes(y=(A2-A8), color="A2")) +
+  geom_point(aes(y=(B2-A8), color="B2")) +
+  geom_point(aes(y=(C2-C8), color="C2")) +
+  geom_point(aes(y=(D2-D8), color="D2")) +
+  geom_point(aes(y=(E2-E8), color="E2")) +
+  geom_point(aes(y=(F2-F8), color="F2")) +
+  geom_point(aes(y=(G2-G8), color="G2")) +
+  geom_point(aes(y=(H2-H8), color="H2")) +
+  scale_y_log10() +
+  scale_x_continuous(breaks = seq(0, 28, by = 2)) +
+  labs(x = "Hours", y = "OD600 (Log 10)") +
+  theme(panel.background = element_rect(fill = "white", colour = "black")) +
+  theme(aspect.ratio = 1) +
+  theme(
+    panel.grid.major.x = element_line(color = "grey80", linetype = "dashed"),
+    panel.grid.minor.x = element_line(colour = "grey85", linetype = "dashed"),
+  ) +
+  ggtitle("AV1 R2A pH 4.0 30C 1:50 subculture replicates") +
+  theme(plot.title = element_text(size = 16)) +
+  theme(plot.title = element_text(hjust = .5)) +
+  theme(axis.text = element_text(face = "plain", size = 12)) + 
+  theme(axis.title = element_text(size = 15)) 
+```
+### Condition 2 Average & Standard Deviation of Replicates
+```{r echo=FALSE}
+gc_2 <- gc %>%
+  rowwise() %>%
+  mutate(
+    m2.R2A = (mean(c(A2,B2,C2,D2,E2,F2,G2,H2)) - mean(c(A8,B8,C8,D8,E8,F8,G8,H8))),
+    sd = sd(c(A2,B2,C2,D2,E2,F2,G2,H2))
+  )
+
+ggplot(gc_2, aes(x = Time, y = m2.R2A)) + geom_point(alpha=0.7, color = "blue") +
+  labs(x = "Time (Hours)", y = "OD600 (Log 10)") +
+  theme(axis.title = element_text(size = 15)) +
+  scale_x_continuous(breaks = seq(0, 28, by = 2)) +
+  scale_y_log10() +
+  ggtitle("AV1 R2A pH 4.0 30C 1:50 subculture") +
+  theme(plot.title = element_text(size = 16)) +
+  theme(plot.title = element_text(hjust = .5)) +
+  theme(panel.background = element_rect(fill = "white", colour = "black")) +
+  theme(aspect.ratio = 1) +
+  theme(
+    panel.grid.major.x = element_line(color = "grey80", linetype = "dashed"),
+    panel.grid.minor.x = element_line(colour = "grey85", linetype = "dashed"),
+  ) +
+  theme(axis.text = element_text(face = "plain", size = 12)) + 
+  geom_errorbar(aes(ymin=m2.R2A-sd, ymax=m2.R2A+sd), width=.1,
+                position=position_dodge(.9))
+```
+### Condition 2 Exponential Growth
+```{r echo=FALSE}
+ex2 <- gc_2[c(5:26),c(1,99)]
+x.2 <- ex2$Time
+y.2 <- ex2$m2.R2A
+
+df2 <- data.frame(x.2, y.2)
+
+exp.mod2    <- lm(log(y.2) ~ x.2, df2)
+
+new_x2      <- seq(min(x.2), max(x.2), 0.01)
+prediction2 <- exp(predict(exp.mod2, newdata = list(x.2 = new_x2)))
+exp_line2   <- data.frame(x.2 = new_x2, y.2 = prediction2)
+
+ex2_plot <- ggplot(data = df2, mapping = aes(x.2, y.2)) + 
+  geom_point(alpha=0.7, color = "blue") +
+  scale_y_log10() +
+  labs(x = "Time (Hours)", y = "OD600 (Log 10)") +
+  theme(axis.title = element_text(size = 15)) +
+  ggtitle("Exponential Phase AV1 R2A pH 4.0 30C 1:50 subculture") +
+  theme(plot.title = element_text(size = 16)) +
+  theme(plot.title = element_text(hjust = .5)) +
+  theme(panel.background = element_rect(fill = "white", colour = "black")) +
+  theme(aspect.ratio = 1) +
+  theme(
+    panel.grid.major.x = element_line(color = "grey80", linetype = "dashed"),
+    panel.grid.minor.x = element_line(colour = "grey85", linetype = "dashed"),
+  ) +
+  geom_line(data = exp_line2)
+
+ex2_plot
+R_sq.2 <- round(summary(exp.mod2)$r.squared, 2)
+B.2 <- as.numeric(round(exp.mod2$coefficients[2], 2))
+dt.2 <- log(2)/B.2
+
+```
+
+
+## Growth Condition 3
+###Condition 3 Individual Replicates
+```{r echo=FALSE}
+ggplot(gc, aes(x = Time)) + 
+  geom_point(aes(y=A3-A8, color="A3")) +
+  geom_point(aes(y=B3-B8, color="B3")) +
+  geom_point(aes(y=C3-C8, color="C3")) +
+  geom_point(aes(y=D3-D8, color="D3")) +
+  geom_point(aes(y=E3-E8, color="E3")) +
+  geom_point(aes(y=F3-F8, color="F3")) +
+  geom_point(aes(y=G3-G8, color="G3")) +
+  geom_point(aes(y=H3-H8, color="H3")) +
+  scale_y_log10() +
+  scale_x_continuous(breaks = seq(0, 28, by = 2)) +
+  labs(x = "Hours", y = "OD600 (Log 10)") +
+  theme(panel.background = element_rect(fill = "white", colour = "black")) +
+  theme(aspect.ratio = 1) +
+  theme(
+    panel.grid.major.x = element_line(color = "grey80", linetype = "dashed"),
+    panel.grid.minor.x = element_line(colour = "grey85", linetype = "dashed"),
+  ) +
+  ggtitle("AV1 R2A pH 4.0 30C 1:100 subculture replicates") +
+  theme(plot.title = element_text(size = 16)) +
+  theme(plot.title = element_text(hjust = .5)) +
+  theme(axis.text = element_text(face = "plain", size = 12)) + 
+  theme(axis.title = element_text(size = 15)) 
+```
+### Condition 3 Average & Standard Deviation of Replicates
+```{r echo=FALSE}
+gc_3.R2A <- gc %>%
+  rowwise() %>%
+  mutate(
+    m3.R2A = (mean(c(A3,B3,C3,D3,E3,F3,G3,H3 - mean(c(A8,B8,C8,D8,E8,F8,G8,H8))))),
+    sd3.R2A = sd(c(A3,B3,C3,D3,E3,F3,G3,H3))
+  )
+
+ggplot(gc_3.R2A, aes(x = Time, y = m3.R2A)) + geom_point(alpha=0.7, color = "blue") +
+  labs(x = "Time (Hours)", y = "OD600 (Log 10)") +
+  theme(axis.title = element_text(size = 15)) +
+  scale_x_continuous(breaks = seq(0, 28, by = 2)) +
+  scale_y_log10() +
+  ggtitle("AV1 R2A pH 4.0 30C 1:100 subculture") +
+  theme(plot.title = element_text(size = 16)) +
+  theme(plot.title = element_text(hjust = .5)) +
+  theme(panel.background = element_rect(fill = "white", colour = "black")) +
+  theme(aspect.ratio = 1) +
+  theme(
+    panel.grid.major.x = element_line(color = "grey80", linetype = "dashed"),
+    panel.grid.minor.x = element_line(colour = "grey85", linetype = "dashed"),
+  ) +
+  theme(axis.text = element_text(face = "plain", size = 12)) + 
+  geom_errorbar(aes(ymin=m3.R2A-sd3.R2A, ymax=m3.R2A+sd3.R2A), width=.1,
+                position=position_dodge(.9))
+```
+### Condition 3 Exponential Growth
+```{r echo=FALSE}
+ex3 <- gc_3.R2A[c(9:36),c(1,99)]
+x.3 <- ex3$Time
+y.3 <- ex3$m3.R2A
+df3 <- data.frame(x.3, y.3)
+exp.mod3    <- lm(log(y.3) ~ x.3, df3)
+new_x3      <- seq(min(x.3), max(x.3), 0.01)
+prediction3 <- exp(predict(exp.mod3, newdata = list(x.3 = new_x3)))
+exp_line3   <- data.frame(x.3 = new_x3, y.3 = prediction3)
+
+ex3_plot <- ggplot(data = df3, mapping = aes(x.3, y.3)) + 
+  geom_point(alpha=0.7, color = "blue") +
+  scale_y_log10() +
+  labs(x = "Time (Hours)", y = "OD600 (Log 10)") +
+  theme(axis.title = element_text(size = 15)) +
+  ggtitle("Exponential Phase AV1 R2A pH 4.0 30C 1:100 subculture") +
+  theme(plot.title = element_text(size = 16)) +
+  theme(plot.title = element_text(hjust = .5)) +
+  theme(panel.background = element_rect(fill = "white", colour = "black")) +
+  theme(aspect.ratio = 1) +
+  theme(
+    panel.grid.major.x = element_line(color = "grey80", linetype = "dashed"),
+    panel.grid.minor.x = element_line(colour = "grey85", linetype = "dashed"),
+  ) +
+  geom_line(data = exp_line3)
+ex3_plot
+R_sq.3 <- round(summary(exp.mod3)$r.squared, 2)
+B.3 <- as.numeric(round(exp.mod3$coefficients[2], 2))
+dt.3 <- log(2)/B.3
+```
+
+## Growth Condition 4
+###Condition 4 Individual Replicates
+```{r echo=FALSE}
+
+```
+### Condition 4 Average & Standard Deviation of Replicates
+```{r echo=FALSE}
+
+```
+### Condition 4 Exponential Growth
+```{r echo=FALSE}
+
+```
+
+
+## Growth Condition 5
+###Condition 5 Individual Replicates
+```{r echo=FALSE}
+
+```
+### Condition 5 Average & Standard Deviation of Replicates
+```{r echo=FALSE}
+
+```
+### Condition 5 Exponential Growth
+```{r echo=FALSE}
+
+```
+
+## Growth Condition 6
+###Condition 6 Individual Replicates
+```{r echo=FALSE}
+
+```
+### Condition 6 Average & Standard Deviation of Replicates
+```{r echo=FALSE}
+
+```
+### Condition 6 Exponential Growth
+```{r echo=FALSE}
+
+```
+
+## Growth Condition 7
+###Condition 7 Individual Replicates
+```{r echo=FALSE}
+
+```
+### Condition 7 Average & Standard Deviation of Replicates
+```{r echo=FALSE}
+
+```
+### Condition 7 Exponential Growth
+```{r echo=FALSE}
+
+```
+
+## Doubling Time for All Conditions 
+
+
+## Discussion
