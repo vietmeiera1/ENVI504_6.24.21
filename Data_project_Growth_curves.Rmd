@@ -740,7 +740,7 @@ dt.7 <- log(2)/B.7
 
 
 
-## Doubling Time for All Conditions 
+## Comparing AV1 Growth Conditions 
 ```{r echo=FALSE}
 Cons2 <- data.frame("Growth_Condition" =c("R2A pH 4.0 1:25", "R2A pH 4.0 1:50", "R2A pH 4.0 1:100", 
                                    "R2A pH 4.0 1:200", "R2A pH 4.0 1:400", "M63+Lactate 1:10", 
