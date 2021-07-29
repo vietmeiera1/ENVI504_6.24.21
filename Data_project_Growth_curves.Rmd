@@ -84,6 +84,7 @@ gc_1 <- gc %>%
     sd = sd(c(A1,B1,C1,D1,E1,F1,G1,H1))
     )
 
+max1 <- max(gc_1$m.R2A)
 
 avg1 <- ggplot(gc_1, aes(x = Time, y = m.R2A)) + geom_point(alpha=0.7, color = "blue") +
   labs(x = "Time (Hours)", y = "OD600 (Log 10)") +
@@ -188,6 +189,8 @@ gc_2 <- gc %>%
     sd = sd(c(A2,B2,C2,D2,E2,F2,G2,H2))
   )
 
+max2 <- max(gc_2$m2.R2A)
+
 ggplot(gc_2, aes(x = Time, y = m2.R2A)) + geom_point(alpha=0.7, color = "blue") +
   labs(x = "Time (Hours)", y = "OD600 (Log 10)") +
   theme(axis.title = element_text(size = 15)) +
@@ -290,6 +293,8 @@ gc_3.R2A <- gc %>%
     sd3.R2A = sd(c(A3,B3,C3,D3,E3,F3,G3,H3))
   )
 
+max3 <- max(gc_3.R2A$m3.R2A)
+
 ggplot(gc_3.R2A, aes(x = Time, y = m3.R2A)) + geom_point(alpha=0.7, color = "blue") +
   labs(x = "Time (Hours)", y = "OD600 (Log 10)") +
   theme(axis.title = element_text(size = 15)) +
@@ -388,6 +393,8 @@ gc_4.R2A <- gc %>%
     sd = sd(c(A4,B4,C4,D4,E4,F4,G4,H4))
   )
 
+max4 <- max(gc_4.R2A$m4.R2A)
+
 ggplot(gc_4.R2A, aes(x = Time, y = m4.R2A)) + geom_point(alpha=0.7, color = "blue") +
   labs(x = "Time (Hours)", y = "OD600 (Log 10)") +
   theme(axis.title = element_text(size = 15)) +
@@ -483,6 +490,7 @@ gc_5.R2A <- gc %>%
     m5 = (mean(c(A5,B5,C5,D5,E5,F5,G5,H5)) - mean(c(A8,B8,C8,D8,E8,F8,G8,H8))),
     sd = sd(c(A5,B5,C5,D5,E5,F5,G5,H5))
   )
+max5 <- max(gc_5.R2A$m5)
 ggplot(gc_5.R2A, aes(x = Time, y = m5)) + geom_point(alpha=0.7, color = "blue") +
   labs(x = "Time (Hours)", y = "OD600 (Log 10)") +
   theme(axis.title = element_text(size = 15)) +
@@ -582,6 +590,9 @@ gc_6.M <- gc %>%
     m6 = (mean(c(A6,B6,C6,D6,E6,F6,G6,H6)) - mean(c(A9,B9,C9,D9,E9,F9,G9,H9))),
     sd = sd(c(A6,B6,C6,D6,E6,F6,G6,H6))
   )
+
+max6 <- max(gc_6.M$m6)
+
 ggplot(gc_6.M, aes(x = Time, y = m6)) + geom_point(alpha=0.7, color = "blue") +
   labs(x = "Time (Hours)", y = "OD600 (Log 10)") +
   theme(axis.title = element_text(size = 15)) +
@@ -683,6 +694,8 @@ gc_7M <- gc %>%
     m7 = (mean(c(A7,B7,C7,D7,E7,F7,G7,H7)) - mean(c(A10,B10,C10,D10,E10,F10,G10,H10))),
     sd = sd(c(A7,B7,C7,D7,E7,F7,G7,H7))
   )
+max7 <- max(gc_7M$m7)
+
 ggplot(gc_7M, aes(x = Time, y = m7)) + geom_point(alpha=0.7, color = "blue") +
   labs(x = "Time (Hours)", y = "OD600 (Log 10)") +
   theme(axis.title = element_text(size = 15)) +
@@ -741,26 +754,38 @@ dt.7 <- log(2)/B.7
 
 
 ## Comparing AV1 Growth Conditions 
-```{r echo=FALSE}
-Cons2 <- data.frame("Growth_Condition" =c("R2A pH 4.0 1:25", "R2A pH 4.0 1:50", "R2A pH 4.0 1:100", 
-                                   "R2A pH 4.0 1:200", "R2A pH 4.0 1:400", "M63+Lactate 1:10", 
-                                                   "M63+Acetate 1:10"),
-                   "Doubling_Time" =c(dt, dt.2, dt.3, dt.4, dt.5, dt.6, dt.7),
-                   "R_squared" = c(R_sq, R_sq.2, R_sq.3, R_sq.4, R_sq.5, R_sq.6, R_sq.7)
-                   )
+```{r echo=FALSE, warning=FALSE}
 
-Cons2 %>%
+Cons3 <- data.frame(
+  "Growth_Condition" =c("R2A pH 4.0 1:25", "R2A pH 4.0 1:50", "R2A pH 4.0 1:100","R2A pH 4.0 1:200", "R2A pH 4.0 1:400", "M63+Lactate 1:10", "M63+Acetate 1:10"),
+                   `Doubling Time` =round(c(dt, dt.2, dt.3, dt.4, dt.5, dt.6, dt.7),2),
+                   "R_squared" = round(c(R_sq, R_sq.2, R_sq.3, R_sq.4, R_sq.5, R_sq.6, R_sq.7),2),
+                   "Growth_Max" = round(c(max1, max2, max3, max4, max5, max6, max7),3)
+                   )
+```
+
+```{r echo=FALSE, warning=FALSE}
+Cons3 %>%
   gt() %>%
   tab_header( title = "Isolate AV1", subtitle = "30C") %>%
-  fmt_number(columns = vars(R_squared), decimals = 2) %>%
-  fmt_number(columns = vars(Doubling_Time), decimals = 2) #changes that number of decimals in the table to the hundredths place
+  cols_label(R_squared = "R Squared", 
+             Doubling.Time = "Doubling Time", 
+             Growth_Max = "Maximum Growth", 
+             Growth_Condition = "Growth Condition") 
 
+
+
+#%>%
+  #fmt_number(columns = vars("R_squared"), decimals = 2) %>%
+  #fmt_number(columns = vars("Doubling_Time"), decimals = 2) %>%
+  #fmt_number(columns = vars("Growth_Max", decimals = 3))
+#changes that number of decimals in the table to the hundredths place
 
 ```
 
 
 
-<b> Table 1.</b> Doubling times and R-squared values for the exponential phase of growth, calculated from the average of eight replicates for each condition. 
+<b> Table 1.</b> Doubling times, R-squared, and maximum growth values for the exponential phase of growth, calculated from the average of eight replicates for each condition. Doubling time is reported in hours. Maximum growth is reported in OD600.
 
 ## Discussion
-Bacterial growth curves of isolate AV1 was carried out in a 96-well plate and readings were taken at OD600 using a platereader. Controls for the experiment included the use of sterile media that would also double as a blank to remove background noise from the growth curves. All r-square values reported for the exponential trend line are within 0.04 to 1, this indicates that the line is a good fit for the data. Although, all R2A replicates were expected to have the same doubling time, this was not found to be true as indicated by table 1. There was an increased length of time required for the bacterial cells to double when inoculated into minimal media M63 supplemented with a carbon source, as expected. Unfortunately, condition 6: AV1 inoculated into M63 minimal media supplemented with lactate as a carbon source did not capture the entire growth curve and therefore should be repeated with increased time to capture the stationary phase of growth. It also appears that isolate AV1 grows better when supplemented with acetate as a carbon source than lactate, which is also as expected, since lactate is a poor carbon source. 
+Bacterial growth curves of isolate AV1 was carried out in a 96-well plate and readings were taken at OD600 using a plate reader. Controls for the experiment included the use of sterile media that would also double as a blank to remove background noise from the growth curves. All r-square values reported for the exponential trend line are within 0.04 to 1, this indicates that the line is a good fit for the data. Although, all R2A replicates were expected to have the same doubling time, this was not found to be true as indicated by table 1. There was an increased length of time required for the bacterial cells to double when inoculated into minimal media M63 supplemented with a carbon source, as expected. Unfortunately, condition 6: AV1 inoculated into M63 minimal media supplemented with lactate as a carbon source did not capture the entire growth curve and therefore should be repeated with increased time to capture the stationary phase of growth. The maximum growth as measured by OD600 was higher for all R2A media conditions than those for M63, this is also expected as R2A is a rich media that allows bacterial isolate AV1 to grow more rapidly, as where M63 has the minimal components needed to support bacterial growth It also appears that isolate AV1 grows better when supplemented with acetate as a carbon source than lactate, which is also as expected, since lactate is a poor carbon source. 
