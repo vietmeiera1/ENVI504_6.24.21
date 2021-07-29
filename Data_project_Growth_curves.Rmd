@@ -6,6 +6,8 @@ output: html_document
 ---
 ---
 
+
+
 ## Introduction
 Abandoned mine drainage (AMD) is the result of abandoned mining operations. AMD is high in sulfuric acid, heavy metals, and metalloids. Treatment of AMD can be carried out via passive remediation systems. Passive remediation systems consist of large settling ponds that promote the biogeochemical precipitation of AMD contaminants. Since these systems are open to the environment, they are naturally colonized by microbial populations. Microbes within these populations metabolically impact the remediation process, both positively and negatively. 
 Isolate AV1 from the Boyce park passive remediation system pond 1 has been identified to positively impact iron remediation and negatively impact manganese remediation. Characterization of this microbial isolate is important to understand more about this novel isolate and understand how it can impact AMD remediation. Characterization of isolate AV1 includes understanding how the isolate grows under different conditions. This is facilitated via growing AV1 in rich media such as R2A as well as minimal media M63. 
@@ -18,6 +20,7 @@ All <b> Figure A's</b> show each individual growth curve for the given condition
 
 ```{r include = FALSE}
 
+library(latex2exp)
 library(readr) 
 library(dplyr)
 library(ggplot2)
@@ -753,7 +756,11 @@ dt.7 <- log(2)/B.7
 
 
 
+
 ## Comparing AV1 Growth Conditions 
+
+<b> Table 1.</b> Doubling times, R-squared, and maximum growth values for the exponential phase of growth, calculated from the average of eight replicates for each condition. Doubling time is reported in hours. Maximum growth is reported in OD600.
+
 ```{r echo=FALSE, warning=FALSE}
 
 Cons3 <- data.frame(
@@ -785,7 +792,7 @@ Cons3 %>%
 
 
 
-<b> Table 1.</b> Doubling times, R-squared, and maximum growth values for the exponential phase of growth, calculated from the average of eight replicates for each condition. Doubling time is reported in hours. Maximum growth is reported in OD600.
+
 
 ## Discussion
 Bacterial growth curves of isolate AV1 was carried out in a 96-well plate and readings were taken at OD600 using a plate reader. Controls for the experiment included the use of sterile media that would also double as a blank to remove background noise from the growth curves. All r-square values reported for the exponential trend line are within 0.04 to 1, this indicates that the line is a good fit for the data. Although, all R2A replicates were expected to have the same doubling time, this was not found to be true as indicated by table 1. There was an increased length of time required for the bacterial cells to double when inoculated into minimal media M63 supplemented with a carbon source, as expected. Unfortunately, condition 6: AV1 inoculated into M63 minimal media supplemented with lactate as a carbon source did not capture the entire growth curve and therefore should be repeated with increased time to capture the stationary phase of growth. The maximum growth as measured by OD600 was higher for all R2A media conditions than those for M63, this is also expected as R2A is a rich media that allows bacterial isolate AV1 to grow more rapidly, as where M63 has the minimal components needed to support bacterial growth It also appears that isolate AV1 grows better when supplemented with acetate as a carbon source than lactate, which is also as expected, since lactate is a poor carbon source. 
